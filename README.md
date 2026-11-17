@@ -18,8 +18,15 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
    **ITEM** uses what you picked up.
 
 - Three tracks, picked at random for each race (never the same one twice in a row): Skyland Sprint, Inferno Keep
-  (a raised road over a lava island with a castle) and Aurora Glacier (a raised road over an ice island under
-  the northern lights). The two new tracks' road layouts and scenery come from their map files.
+  and Aurora Glacier. Scenery comes from each track's map file; each has its own road layout and landmark.
+- Inferno Keep: a twisting route across the lava island that runs straight through a stone gatehouse, then climbs
+  and crosses back over the top of it on a bridge. Lava floods break out at random on three stretches: the road
+  glows as a warning, then lava covers one half of it for a few seconds. Touch the lava (or the lava lakes) and the
+  cloud fishes you out.
+- Aurora Glacier: starts low in the glacier valley inside a snowstorm (short visibility), runs through an ice cave,
+  then spirals up a mountain to a glowing crystal summit where the storm clears and the northern lights fill the
+  sky. The long run back down is very fast, with camera shake, speed lines and a slightly loose feel. Three
+  stretches freeze over at random and turn slippery for several seconds.
 - Skyland Sprint: a figure-8 across the floating island with a high bridge over the lower straight, a giant pipe
   tunnel, a jump over the pond and a road that loops out over the clouds. Off the road is grass (slower). The road
   over the clouds has no side rails: drive off it, or off the island's edge, and a smiling cloud fishes you out
