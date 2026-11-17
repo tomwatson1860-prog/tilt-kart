@@ -4,7 +4,7 @@
 
    ACCESS_CODE=<code> node tools/build_site.js <source folder>
 
- The source folder holds index.html, controller.html, game.js, controller.js and assets/skyland-sprint.glb.
+ The source folder holds index.html, controller.html, game.js, controller.js and the race-track files in assets/.
  It is NOT kept in this repository in readable form: the build stores an encrypted copy in source.enc
  (restore it with tools/unpack_source.js).
 
@@ -69,9 +69,11 @@ if (!gate.includes('<meta name="referrer" content="no-referrer">') || !/noindex,
 if (/(?:src|href)="\s*(?:https?:)?\/\//i.test(gate)) fail('tools/gate.html loads something from another server');
 if (gate.includes(code)) fail('the access code appears in tools/gate.html');
 
-const map = fs.readFileSync(path.join(src, 'assets', 'skyland-sprint.glb'));
+const indexParts = { GAME_JS: inline(read('game.js')) };
+for (const m of read('index.html').matchAll(/\{\{MAP_B64:([a-z0-9-]+\.glb)\}\}/g)) indexParts['MAP_B64:' + m[1]] = fs.readFileSync(path.join(src, 'assets', m[1])).toString('base64');
+if (Object.keys(indexParts).length < 2) fail('index.html names no map files');
 const pages = {
-  'index.html': assemble('index.html', { GAME_JS: inline(read('game.js')), MAP_B64: map.toString('base64') }),
+  'index.html': assemble('index.html', indexParts),
   'controller.html': assemble('controller.html', { CONTROLLER_JS: inline(read('controller.js')) })
 };
 const res = { ok: true, pages: {}, outsideLoads: 0 };

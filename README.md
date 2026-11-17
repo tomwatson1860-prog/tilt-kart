@@ -17,7 +17,10 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
 3. Hold the phone sideways. Tilt to steer, right thumb = **GAS**, left thumb = **DRIFT** / **BRAKE**,
    **ITEM** uses what you picked up.
 
-- The track: a figure-8 across the floating island with a high bridge over the lower straight, a giant pipe
+- Three tracks, picked at random for each race (never the same one twice in a row): Skyland Sprint, Inferno Keep
+  (a raised road over a lava island with a castle) and Aurora Glacier (a raised road over an ice island under
+  the northern lights). The two new tracks' road layouts and scenery come from their map files.
+- Skyland Sprint: a figure-8 across the floating island with a high bridge over the lower straight, a giant pipe
   tunnel, a jump over the pond and a road that loops out over the clouds. Off the road is grass (slower). The road
   over the clouds has no side rails: drive off it, or off the island's edge, and a smiling cloud fishes you out
   with its rod and sets you back on the track (it takes 3 seconds and costs 2 coins).
