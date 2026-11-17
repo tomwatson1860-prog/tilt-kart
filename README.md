@@ -19,10 +19,12 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
 
 - Three tracks, picked at random for each race (never the same one twice in a row): Skyland Sprint, Inferno Keep
   and Aurora Glacier. Scenery comes from each track's map file; each has its own road layout and landmark.
-- Inferno Keep: a twisting route across the lava island that runs straight through a stone gatehouse, then climbs
-  and crosses back over the top of it on a bridge. Lava floods break out at random on three stretches: the road
-  glows as a warning, then lava covers one half of it for a few seconds. Touch the lava (or the lava lakes) and the
-  cloud fishes you out.
+- Inferno Keep: everything off the road is lava. The road runs on rock causeways and bridges, so drive off it
+  and the cloud fishes you out. The route runs straight through a walled castle (arched gates with drawbridges and
+  a raised portcullis, round and square towers, battlements, banners, a great keep with lit windows and a great
+  hall), then climbs and crosses back over the top of it. Three volcanoes smoke in the lava sea and erupt every
+  few seconds: the road glows red where lava bombs will land, then they splash down and coat one half of that
+  stretch for a few seconds. Lava also floods three other stretches at random.
 - Aurora Glacier: starts low in the glacier valley inside a snowstorm (short visibility), runs through an ice cave,
   then spirals up a mountain to a glowing crystal summit where the storm clears and the northern lights fill the
   sky. The run back down is twice as steep as the climb and very fast, with camera shake, speed lines and a

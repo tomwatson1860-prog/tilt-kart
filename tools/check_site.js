@@ -61,6 +61,8 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   host.on('console', m => { if (m.type() === 'error') errors.push(m.text()); }); host.on('pageerror', e => errors.push(String(e)));
   await enter(host, CODE);
   await host.waitForFunction(() => window.__tk && window.__tk.get().peerReady, null, { timeout: 40000 }).catch(() => { });
+  // the phone-steering checks run on Skyland Sprint, where a long tilt can't end in lava (the full race below still picks a random track)
+  await host.evaluate(() => window.__tk && window.__tk.setTrack(0)).catch(() => { });
   const h0 = await host.evaluate(() => window.__tk ? window.__tk.get() : null);
   ok(h0 && h0.peerReady, 'the right access code opens the game, which registers with the pairing service');
   await sleep(800); await snap(host, '1-lobby.png');
