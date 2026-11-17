@@ -16,6 +16,10 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
    link carries the access code, so the phone does not ask for it.
 3. Hold the phone sideways. Tilt to steer, right thumb = **GAS**, left thumb = **DRIFT** (top) and **ITEM**
    (bottom). The big middle button starts a race, then pauses and resumes it (P on the keyboard does the same).
+4. Two players: a second phone scans the same QR code and joins as Player 2. The screen splits top / bottom,
+   each half following one player's kart with its own items, place and lap (the four computer drivers still race).
+   Either phone can start or pause. If a phone drops mid-race the race pauses; if Player 2's phone stays away
+   for 15 seconds its kart goes back to a computer driver. The results show both players and who won the duel.
 
 - Three tracks, picked at random for each race (never the same one twice in a row): Skyland Sprint, Inferno Keep
   and Aurora Glacier. Scenery comes from each track's map file; each has its own road layout and landmark.

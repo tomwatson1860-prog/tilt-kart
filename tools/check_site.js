@@ -112,6 +112,23 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   const pz2 = await host.evaluate(() => window.__tk.get().paused); await sleep(400);
   ok(pz1 && !pz2 && /RESUME/.test(plabel), "the phone's middle button pauses and resumes the race (button showed " + plabel + ')');
   await snap(phone, '2c-phone-racing.png');
+  // --- a second phone joins as Player 2: split screen, its own kart ---
+  const phoneB = await open({ viewport: { width: 780, height: 360 }, isMobile: true, hasTouch: true }, link);
+  await phoneB.waitForFunction(() => window.__tc, null, { timeout: 30000 }).catch(() => { });
+  await phoneB.click('#go').catch(() => { });
+  await host.waitForFunction(() => window.__tk.players().two, null, { timeout: 25000 }).catch(() => { });
+  const two = await host.evaluate(() => window.__tk.players());
+  await phoneB.waitForFunction(() => window.__tc.get().me === 2, null, { timeout: 5000 }).catch(() => { });
+  ok(two.two && two.p2.player && await phoneB.evaluate(() => window.__tc.get().me === 2) && await host.evaluate(() => document.body.classList.contains('split')), 'a second phone joins as Player 2 and the screen splits');
+  await phoneB.dispatchEvent('#gas', 'pointerdown', { pointerId: 1, bubbles: true });
+  await sleep(1200);
+  const q0 = await host.evaluate(() => window.__tk.players().p2);
+  await phoneB.evaluate(() => { window.__tiltTimer = setInterval(() => window.__tc.tilt({ beta: -25, gamma: 0 }), 30); });
+  await sleep(1600);
+  const q1 = await host.evaluate(() => window.__tk.players().p2); await snap(host, '3b-split.png'); await snap(phoneB, '2d-phone-p2.png');
+  ok(!q1.auto && q1.speed > 10 && q1.th - q0.th > 0.2, 'Player 2 drives their own kart (speed ' + q1.speed.toFixed(1) + ', heading change ' + (q1.th - q0.th).toFixed(2) + ')');
+  await phoneB.close(); await sleep(2200);
+  ok(await host.evaluate(() => window.__tk.get().paused && /Player 2/.test(document.getElementById('lobby-title').textContent)), "race pauses when Player 2's phone drops off");
   await phone.close(); await sleep(2200);
   const d = await host.evaluate(() => window.__tk.get());
   ok(d.paused && !d.alive, 'race pauses when the phone drops off');
@@ -119,18 +136,26 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 
   // --- keyboard: drift + mini-turbo, items, whole race ---
   if (process.argv.includes('--full')) {
+    // drift + mini-turbo on Skyland Sprint, where a held hard turn can't end in lava (and a rescue would reset the charge)
+    const dp = await open({ viewport: { width: 640, height: 360 } }, base);
+    await enter(dp, CODE); await dp.waitForFunction(() => window.__tk, null, { timeout: 40000 }); await dp.evaluate(() => window.__tk.setTrack(0)); await sleep(500);
+    await dp.keyboard.down('ArrowUp');
+    await dp.waitForFunction(() => { const s = window.__tk.get(); return s.phase === 'race' && s.lap === 0 && s.idx > 12 && s.speed > 30; }, null, { timeout: 60000 }).catch(() => { });
+    await dp.keyboard.down('ArrowLeft'); await dp.keyboard.down('ShiftLeft');
+    await dp.waitForFunction(() => window.__tk.get().charge > 1, null, { timeout: 15000 }).catch(() => { });
+    const dr = await dp.evaluate(() => window.__tk.get()); await snap(dp, '4-drift.png');
+    // watch every frame from the moment DRIFT is let go, so a short (blue) mini-turbo can't slip between samples
+    await dp.evaluate(() => { window.__boostSeen = 0; (function w() { const s = window.__tk.get(); if (s.boost > window.__boostSeen) window.__boostSeen = s.boost; if (!window.__boostStop) requestAnimationFrame(w); })(); });
+    await dp.keyboard.up('ShiftLeft'); await dp.keyboard.up('ArrowLeft'); await sleep(400);
+    const af = await dp.evaluate(() => { window.__boostStop = 1; return Object.assign(window.__tk.get(), { boost: window.__boostSeen }); });
+    ok(dr.drift !== 0 && dr.charge > 1 && af.boost > 0 && af.drift === 0, 'drifting charges up and releasing gives a mini-turbo (charge ' + dr.charge.toFixed(2) + ', boost ' + af.boost.toFixed(2) + ')');
+    await dp.close();
+    // a whole race on whichever track comes up
     const solo = await open({ viewport: { width: 640, height: 360 } }, base);
     await enter(solo, CODE); await solo.waitForFunction(() => window.__tk, null, { timeout: 40000 }); await sleep(500);
+    const trackName = await solo.evaluate(() => window.__tk.track().name);
     await solo.keyboard.down('ArrowUp');
-    await solo.waitForFunction(() => { const s = window.__tk.get(); return s.phase === 'race' && s.lap === 0 && s.idx > 12 && s.speed > 30; }, null, { timeout: 60000 }).catch(() => { });
-    await solo.keyboard.down('ArrowLeft'); await solo.keyboard.down('ShiftLeft');
-    await solo.waitForFunction(() => window.__tk.get().charge > 1, null, { timeout: 15000 }).catch(() => { });
-    const dr = await solo.evaluate(() => window.__tk.get()); await snap(solo, '4-drift.png');
-    // watch every frame from the moment DRIFT is let go, so a short (blue) mini-turbo can't slip between samples
-    await solo.evaluate(() => { window.__boostSeen = 0; (function w() { const s = window.__tk.get(); if (s.boost > window.__boostSeen) window.__boostSeen = s.boost; if (!window.__boostStop) requestAnimationFrame(w); })(); });
-    await solo.keyboard.up('ShiftLeft'); await solo.keyboard.up('ArrowLeft'); await sleep(400);
-    const af = await solo.evaluate(() => { window.__boostStop = 1; return Object.assign(window.__tk.get(), { boost: window.__boostSeen }); });
-    ok(dr.drift !== 0 && dr.charge > 1 && af.boost > 0 && af.drift === 0, 'drifting charges up and releasing gives a mini-turbo (charge ' + dr.charge.toFixed(2) + ', boost ' + af.boost.toFixed(2) + ')');
+    await solo.waitForFunction(() => window.__tk.get().phase === 'race', null, { timeout: 60000 }).catch(() => { });
     // the rest of the race: the game's own driver steers (as a phone would, smoothly); items are still used with Space
     await solo.evaluate(() => window.__tk.autopilot(true));
     let t0 = Date.now(), gotItem = false, usedItem = false, last = null, fell = 0;
@@ -140,7 +165,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
       await sleep(40);
     }
     const st = await solo.evaluate(() => window.__tk.stats());
-    console.log('     race stats: ' + st.map(k => k.name + ' ' + (k.fin !== null ? k.fin + 's' : 'lap ' + k.lap) + ' hits ' + k.hits + ' falls ' + k.falls).join(' | '));
+    console.log('     race on ' + trackName + ': ' + st.map(k => k.name + ' ' + (k.fin !== null ? k.fin + 's' : 'lap ' + k.lap) + ' hits ' + k.hits + ' falls ' + k.falls).join(' | '));
     ok(gotItem && usedItem, 'item boxes hand out items that can be used');
     ok(last.phase === 'finished', 'a full race can be finished (time ' + last.raceT.toFixed(1) + 's, place ' + last.place + ')');
     await sleep(500); await snap(solo, '5-finish.png'); await solo.close();
