@@ -18,8 +18,9 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
    **ITEM** uses what you picked up.
 
 - The track: a figure-8 across the floating island with a high bridge over the lower straight, a giant pipe
-  tunnel, a jump over the pond and a road that loops out over the clouds. Off the road is grass (slower); off
-  the island's edge you fall and are put back on the track.
+  tunnel, a jump over the pond and a road that loops out over the clouds. Off the road is grass (slower). The road
+  over the clouds has no side rails: drive off it, or off the island's edge, and a smiling cloud fishes you out
+  with its rod and sets you back on the track (it takes 3 seconds and costs 2 coins).
 - Hold DRIFT through a corner: blue sparks, then orange, then pink. Let go for a mini-turbo; the longer the
   drift, the bigger the boost. Tap DRIFT in the air off the jump for a trick and a boost when you land.
 - Press GAS just as the countdown reaches 1 for a rocket start.
