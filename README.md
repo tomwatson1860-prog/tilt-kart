@@ -25,8 +25,12 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
   cloud fishes you out.
 - Aurora Glacier: starts low in the glacier valley inside a snowstorm (short visibility), runs through an ice cave,
   then spirals up a mountain to a glowing crystal summit where the storm clears and the northern lights fill the
-  sky. The long run back down is very fast, with camera shake, speed lines and a slightly loose feel. Three
-  stretches freeze over at random and turn slippery for several seconds.
+  sky. The run back down is twice as steep as the climb and very fast, with camera shake, speed lines and a
+  slightly loose feel (only there; the other tracks drive normally). Three stretches freeze over at random and
+  turn slippery for several seconds.
+- Each track has its own original soundtrack, made live in the browser: a bright, bouncy tune for Skyland Sprint,
+  a dark, driving one with a castle bell for Inferno Keep (a low rumble joins while lava flows), and an airy,
+  echoing one for Aurora Glacier whose ice bells ring brighter under the northern lights.
 - Skyland Sprint: a figure-8 across the floating island with a high bridge over the lower straight, a giant pipe
   tunnel, a jump over the pond and a road that loops out over the clouds. Off the road is grass (slower). The road
   over the clouds has no side rails: drive off it, or off the island's edge, and a smiling cloud fishes you out

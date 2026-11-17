@@ -114,8 +114,10 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await solo.keyboard.down('ArrowLeft'); await solo.keyboard.down('ShiftLeft');
     await solo.waitForFunction(() => window.__tk.get().charge > 1, null, { timeout: 15000 }).catch(() => { });
     const dr = await solo.evaluate(() => window.__tk.get()); await snap(solo, '4-drift.png');
-    await solo.keyboard.up('ShiftLeft'); await solo.keyboard.up('ArrowLeft'); await sleep(250);
-    const af = await solo.evaluate(() => window.__tk.get());
+    // watch every frame from the moment DRIFT is let go, so a short (blue) mini-turbo can't slip between samples
+    await solo.evaluate(() => { window.__boostSeen = 0; (function w() { const s = window.__tk.get(); if (s.boost > window.__boostSeen) window.__boostSeen = s.boost; if (!window.__boostStop) requestAnimationFrame(w); })(); });
+    await solo.keyboard.up('ShiftLeft'); await solo.keyboard.up('ArrowLeft'); await sleep(400);
+    const af = await solo.evaluate(() => { window.__boostStop = 1; return Object.assign(window.__tk.get(), { boost: window.__boostSeen }); });
     ok(dr.drift !== 0 && dr.charge > 1 && af.boost > 0 && af.drift === 0, 'drifting charges up and releasing gives a mini-turbo (charge ' + dr.charge.toFixed(2) + ', boost ' + af.boost.toFixed(2) + ')');
     // the rest of the race: the game's own driver steers (as a phone would, smoothly); items are still used with Space
     await solo.evaluate(() => window.__tk.autopilot(true));
