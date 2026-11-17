@@ -12,7 +12,7 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
 ## Play
 
 1. Open the website on a computer and enter the access code.
-2. Scan the QR code with a phone on the same Wi-Fi and tap **Start** (allow motion access if asked). The QR
+2. Scan the QR code with a phone and tap **Start** (allow motion access if asked). The QR
    link carries the access code, so the phone does not ask for it.
 3. Hold the phone sideways. Tilt to steer, right thumb = **GAS**, left thumb = **DRIFT** / **BRAKE**,
    **ITEM** uses what you picked up.
@@ -27,8 +27,10 @@ No phone? Arrow keys steer, Up = gas, Down = brake, Shift = drift, Space = item.
 ## How the phone talks to the computer
 
 The two pages find each other through the public PeerJS pairing service (`wss://0.peerjs.com`), then connect
-directly to each other over the local network. Only the connection handshake goes through that service;
-steering goes phone-to-computer. This is the single outside connection the site allows.
+to each other. To do that across different networks they use PeerJS's standard helpers: Google's address-lookup
+server (`stun.l.google.com`) and, only when no direct link is possible, the PeerJS relay (`turn.peerjs.com`).
+Steering is encrypted between the phone and the computer, so a relay cannot read it. These are the only
+outside connections the site makes.
 
 ## Updating the site
 
@@ -52,7 +54,8 @@ refused. The access code is never stored in this repository.
   qrcode-generator 1.4.4) are in `lib/`, with their licences. Each is fingerprinted (Subresource Integrity,
   SHA-384), so a browser refuses any copy that has been altered.
 - The code screen sets a Content Security Policy that blocks loading anything from other servers, with one
-  exception: the phone-pairing connection to `wss://0.peerjs.com`. No referrer is sent.
+  exception: the phone-pairing connection to `wss://0.peerjs.com`. The phone-to-computer link itself (WebRTC) and its
+  helper servers are not covered by that policy. No referrer is sent.
 - No cookies, analytics or forms that send data; the access code is checked in the visitor's browser and
   never leaves it.
 - A short access code only keeps casual visitors out: the encrypted page can be saved and every code tried

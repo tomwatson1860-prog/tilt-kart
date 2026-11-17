@@ -81,7 +81,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await phone.click('#go');
   await phone.waitForFunction(() => window.__tc.get().open, null, { timeout: 20000 }).catch(() => { });
   await host.waitForFunction(() => window.__tk.get().alive, null, { timeout: 5000 }).catch(() => { });
-  ok((await host.evaluate(() => window.__tk.get().alive)), 'phone pairs with the game (direct connection)');
+  ok((await host.evaluate(() => window.__tk.get().alive)), 'phone pairs with the game');
   await sleep(600); await snap(phone, '2-phone.png');
 
   await phone.dispatchEvent('#gas', 'pointerdown', { pointerId: 1, bubbles: true });
