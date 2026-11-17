@@ -17,12 +17,19 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
 3. Hold the phone sideways. Tilt to steer, right thumb = **GAS**, left thumb = **DRIFT** / **BRAKE**,
    **ITEM** uses what you picked up.
 
-- Hold DRIFT in a corner until sparks show, then let go for a mini-turbo (blue sparks, then orange for a longer one).
+- The track: a figure-8 across the floating island with a high bridge over the lower straight, a giant pipe
+  tunnel, a jump over the pond and a road that loops out over the clouds. Off the road is grass (slower); off
+  the island's edge you fall and are put back on the track.
+- Hold DRIFT through a corner: blue sparks, then orange, then pink. Let go for a mini-turbo; the longer the
+  drift, the bigger the boost. Tap DRIFT in the air off the jump for a trick and a boost when you land.
 - Press GAS just as the countdown reaches 1 for a rocket start.
-- Item boxes give a Turbo, a Bowler (rolls ahead and spins out whoever it hits) or a Slick (dropped behind you).
-- Coins raise your top speed a little, up to 10.
+- Item boxes give Mario Kart-style items (original designs): banana, triple banana, green shell, triple green,
+  red shell (homes in on the kart ahead), triple red, blue shell (hits the leader), rocket (drives you ahead),
+  lightning (shrinks everyone else), ink (splats the screens of the karts ahead), turbo, triple turbo and star.
+  The further back you are, the better the item. Triple bananas and shells also block one hit.
+- Coins raise your top speed a little, up to 10; getting hit or falling off costs coins.
 
-No phone? Arrow keys steer, Up = gas, Down = brake, Shift = drift, Space = item.
+No phone? Arrow keys steer, Up = gas, Down = brake, Shift = drift (and tricks), Space = item.
 
 ## How the phone talks to the computer
 

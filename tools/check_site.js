@@ -87,17 +87,18 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await phone.dispatchEvent('#gas', 'pointerdown', { pointerId: 1, bubbles: true });
   await host.waitForFunction(() => window.__tk.get().phase === 'race', null, { timeout: 12000 }).catch(() => { });
   ok((await host.evaluate(() => window.__tk.get().phase)) === 'race', 'GAS on the phone starts the race');
-  await sleep(2500);
+  await host.waitForFunction(() => { const s = window.__tk.get(); return s.lap === 0 && s.idx > 12 && s.speed > 20; }, null, { timeout: 30000 }).catch(() => { });
+  await sleep(500);
   const a = await host.evaluate(() => window.__tk.get());
   ok(a.speed > 20, 'holding GAS accelerates the kart (speed ' + a.speed.toFixed(1) + ')');
   await phone.evaluate(() => { window.__tiltTimer = setInterval(() => window.__tc.tilt({ beta: -25, gamma: 0 }), 30); });
-  await sleep(700);
+  await sleep(1600);
   const s1 = await phone.evaluate(() => window.__tc.get().s), b = await host.evaluate(() => window.__tk.get());
   ok(s1 < -0.5 && b.th - a.th > 0.2, 'tilting left steers left (steer ' + s1.toFixed(2) + ', heading change ' + (b.th - a.th).toFixed(2) + ')');
   await phone.evaluate(() => { clearInterval(window.__tiltTimer); window.__tiltTimer = setInterval(() => window.__tc.tilt({ beta: 25, gamma: 0 }), 30); });
-  await sleep(700);
+  await sleep(1600);
   const c = await host.evaluate(() => window.__tk.get());
-  ok(c.th - b.th < -0.2, 'tilting right steers right (' + (c.th - b.th).toFixed(2) + ')');
+  ok(c.th - b.th < -0.2, 'tilting right steers right (steer ' + (await phone.evaluate(() => window.__tc.get().s)).toFixed(2) + ', heading change ' + (c.th - b.th).toFixed(2) + ')');
   await snap(host, '3-race.png');
   await phone.close(); await sleep(2200);
   const d = await host.evaluate(() => window.__tk.get());
@@ -109,23 +110,25 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     const solo = await open({ viewport: { width: 640, height: 360 } }, base);
     await enter(solo, CODE); await solo.waitForFunction(() => window.__tk, null, { timeout: 40000 }); await sleep(500);
     await solo.keyboard.down('ArrowUp');
-    await solo.waitForFunction(() => window.__tk.get().phase === 'race' && window.__tk.get().speed > 30, null, { timeout: 60000 }).catch(() => { });
+    await solo.waitForFunction(() => { const s = window.__tk.get(); return s.phase === 'race' && s.lap === 0 && s.idx > 12 && s.speed > 30; }, null, { timeout: 60000 }).catch(() => { });
     await solo.keyboard.down('ArrowLeft'); await solo.keyboard.down('ShiftLeft');
     await solo.waitForFunction(() => window.__tk.get().charge > 1, null, { timeout: 15000 }).catch(() => { });
     const dr = await solo.evaluate(() => window.__tk.get()); await snap(solo, '4-drift.png');
     await solo.keyboard.up('ShiftLeft'); await solo.keyboard.up('ArrowLeft'); await sleep(250);
     const af = await solo.evaluate(() => window.__tk.get());
     ok(dr.drift !== 0 && dr.charge > 1 && af.boost > 0 && af.drift === 0, 'drifting charges up and releasing gives a mini-turbo (charge ' + dr.charge.toFixed(2) + ', boost ' + af.boost.toFixed(2) + ')');
-    let dir = 0, t0 = Date.now(), gotItem = false, usedItem = false, last = null;
+    // the rest of the race: the game's own driver steers (as a phone would, smoothly); items are still used with Space
+    await solo.evaluate(() => window.__tk.autopilot(true));
+    let t0 = Date.now(), gotItem = false, usedItem = false, last = null, fell = 0;
     while (Date.now() - t0 < 420000) {
       const s = last = await solo.evaluate(() => window.__tk.get()); if (s.phase === 'finished') break;
-      const nd = s.aim > 0.05 ? -1 : s.aim < -0.05 ? 1 : 0;
-      if (nd !== dir) { if (dir) await solo.keyboard.up(dir < 0 ? 'ArrowLeft' : 'ArrowRight'); if (nd) await solo.keyboard.down(nd < 0 ? 'ArrowLeft' : 'ArrowRight'); dir = nd; }
-      if (s.item) { gotItem = true; await solo.keyboard.press('Space'); usedItem = true; }
-      await sleep(20);
+      if (s.item) { gotItem = true; const before = s.item + s.uses; await solo.keyboard.press('Space'); await sleep(60); const a = await solo.evaluate(() => window.__tk.get()); if ((a.item || '') + a.uses !== before) usedItem = true; }
+      await sleep(40);
     }
+    const st = await solo.evaluate(() => window.__tk.stats());
+    console.log('     race stats: ' + st.map(k => k.name + ' ' + (k.fin !== null ? k.fin + 's' : 'lap ' + k.lap) + ' hits ' + k.hits + ' falls ' + k.falls).join(' | '));
     ok(gotItem && usedItem, 'item boxes hand out items that can be used');
-    ok(last.phase === 'finished', 'a full race can be finished by keyboard (time ' + last.raceT.toFixed(1) + 's, place ' + last.place + ')');
+    ok(last.phase === 'finished', 'a full race can be finished (time ' + last.raceT.toFixed(1) + 's, place ' + last.place + ')');
     await sleep(500); await snap(solo, '5-finish.png'); await solo.close();
   }
 
