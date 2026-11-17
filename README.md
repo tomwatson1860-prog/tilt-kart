@@ -14,8 +14,8 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
 1. Open the website on a computer and enter the access code.
 2. Scan the QR code with a phone and tap **Start** (allow motion access if asked). The QR
    link carries the access code, so the phone does not ask for it.
-3. Hold the phone sideways. Tilt to steer, right thumb = **GAS**, left thumb = **DRIFT** / **BRAKE**,
-   **ITEM** uses what you picked up.
+3. Hold the phone sideways. Tilt to steer, right thumb = **GAS**, left thumb = **DRIFT** (top) and **ITEM**
+   (bottom). The big middle button starts a race, then pauses and resumes it (P on the keyboard does the same).
 
 - Three tracks, picked at random for each race (never the same one twice in a row): Skyland Sprint, Inferno Keep
   and Aurora Glacier. Scenery comes from each track's map file; each has its own road layout and landmark.
@@ -31,8 +31,9 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
   slightly loose feel (only there; the other tracks drive normally). Three stretches freeze over at random and
   turn slippery for several seconds.
 - Each track has its own original soundtrack, made live in the browser: a bright, bouncy tune for Skyland Sprint,
-  a dark, driving one with a castle bell for Inferno Keep (a low rumble joins while lava flows), and an airy,
-  echoing one for Aurora Glacier whose ice bells ring brighter under the northern lights.
+  a dark, driving one with a castle bell for Inferno Keep (a low rumble joins while lava flows), and a Christmas sleigh-ride
+  arrangement of the public-domain carol "Jingle Bells" (1857) for Aurora Glacier, with sleigh bells and a
+  glockenspiel; its high bells ring brighter under the northern lights and the jingles speed up on the descent.
 - Skyland Sprint: a figure-8 across the floating island with a high bridge over the lower straight, a giant pipe
   tunnel, a jump over the pond and a road that loops out over the clouds. Off the road is grass (slower). The road
   over the clouds has no side rails: drive off it, or off the island's edge, and a smiling cloud fishes you out

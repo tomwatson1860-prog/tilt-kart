@@ -102,6 +102,16 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   const c = await host.evaluate(() => window.__tk.get());
   ok(c.th - b.th < -0.2, 'tilting right steers right (steer ' + (await phone.evaluate(() => window.__tc.get().s)).toFixed(2) + ', heading change ' + (c.th - b.th).toFixed(2) + ')');
   await snap(host, '3-race.png');
+  // the phone's middle button pauses and resumes the race
+  await phone.dispatchEvent('#pause', 'pointerdown', { pointerId: 3, bubbles: true });
+  await host.waitForFunction(() => window.__tk.get().paused, null, { timeout: 5000 }).catch(() => { });
+  const pz1 = await host.evaluate(() => window.__tk.get().paused); await sleep(500);
+  const plabel = await phone.evaluate(() => window.__tc.get().pause); await snap(phone, '2b-phone-paused.png');
+  await phone.dispatchEvent('#pause', 'pointerdown', { pointerId: 3, bubbles: true });
+  await host.waitForFunction(() => !window.__tk.get().paused, null, { timeout: 5000 }).catch(() => { });
+  const pz2 = await host.evaluate(() => window.__tk.get().paused); await sleep(400);
+  ok(pz1 && !pz2 && /RESUME/.test(plabel), "the phone's middle button pauses and resumes the race (button showed " + plabel + ')');
+  await snap(phone, '2c-phone-racing.png');
   await phone.close(); await sleep(2200);
   const d = await host.evaluate(() => window.__tk.get());
   ok(d.paused && !d.alive, 'race pauses when the phone drops off');
