@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' wss://0.peerjs.com; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Tilt Kart</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(#2478e6,#8fd0ff 60%,#e8f6ff);color:#fff;font:16px/1.5 Arial,"Helvetica Neue",sans-serif;padding:16px}
+.card{background:rgba(27,29,42,.92);border:5px solid #fff;border-radius:24px;padding:26px 24px;width:100%;max-width:380px;box-shadow:0 12px 0 rgba(0,0,0,.2)}
+h1{font:italic 900 40px/1.1 "Arial Black",Arial,sans-serif;margin:0 0 6px;color:#ffd23a}
+p{margin:0 0 16px;font-size:15px;opacity:.85}
+label{display:block;font-size:14px;margin-bottom:6px;opacity:.85}
+.row{display:flex;gap:8px}
+input{flex:1;min-width:0;font:inherit;font-size:20px;letter-spacing:.25em;padding:8px 12px;border:2px solid #fff;border-radius:10px;background:#2a2d40;color:#ffd23a}
+button{font:inherit;font-weight:700;padding:8px 18px;border-radius:10px;border:0;background:#ff5a1f;color:#fff;cursor:pointer}
+button:disabled{opacity:.6;cursor:wait}
+input:focus-visible,button:focus-visible{outline:3px solid #ffd23a;outline-offset:2px}
+.err{color:#ff9d8f;font-size:14px;min-height:21px;margin:10px 0 0;opacity:1}
+</style>
+</head>
+<body>
+<main class="card">
+  <h1>Tilt Kart</h1>
+  <p>Enter the access code to play.</p>
+  <form id="f" autocomplete="off">
+    <label for="code">Access code</label>
+    <div class="row"><input id="code" type="password" autocomplete="off" required autofocus><button id="go" type="submit">Open</button></div>
+    <p class="err" id="err" role="alert"></p>
+  </form>
+</main>
+<script>
+/* The game is stored encrypted (AES-GCM, key derived from the access code with PBKDF2-SHA-256) and is decrypted in the browser. */
+const P=/*PAYLOAD*/;
+const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function unlock(code){
+  const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(code),'PBKDF2',false,['deriveKey']);
+  const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64(P.salt),iterations:P.iter,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['decrypt']);
+  const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(P.iv)},key,b64(P.ct));
+  return await new Response(new Blob([plain]).stream().pipeThrough(new DecompressionStream('gzip'))).text();}
+const f=document.getElementById('f'),inp=document.getElementById('code'),err=document.getElementById('err'),go=document.getElementById('go');
+async function tryCode(code,typed){go.disabled=true;err.textContent='Checking…';
+  try{const html=await unlock(code);try{sessionStorage.setItem('tiltkart-access',code);}catch(e){}document.open();document.write(html);document.close();return true;}
+  catch(e){if(!typed){try{sessionStorage.removeItem('tiltkart-access');}catch(x){}}err.textContent=e&&e.name==='OperationError'?(typed?'That code is not right. Try again.':''):'This browser could not open the game. Try an up-to-date Chrome, Edge, Safari or Firefox.';go.disabled=false;inp.focus();inp.select();return false;}}
+f.addEventListener('submit',ev=>{ev.preventDefault();const c=inp.value.trim();if(c)tryCode(c,true);});
+if(!window.crypto||!crypto.subtle||typeof DecompressionStream==='undefined'){err.textContent='Open this page in an up-to-date browser over https.';go.disabled=true;}
+else{(async()=>{
+  /* a phone that scanned the game's QR code carries the code after the 5-letter room name: #ROOMX-code */
+  let h='';try{h=decodeURIComponent((location.hash||'').slice(7));}catch(e){}
+  if(h&&await tryCode(h,false))return;
+  let c=null;try{c=sessionStorage.getItem('tiltkart-access');}catch(e){}
+  if(c)tryCode(c,false);})();}
+</script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "libs": [
+    {
+      "local": "lib/three.min.js",
+      "package": "three",
+      "version": "0.160.0",
+      "file": "build/three.min.js",
+      "integrity": "sha384-qOkzR5Ke/XkQxuGVJ9hpFEpDlcoLtWwVYhnJf06cLIZa2vaIptSqaubivErzmD5O"
+    },
+    {
+      "local": "lib/peerjs.min.js",
+      "package": "peerjs",
+      "version": "1.5.4",
+      "file": "dist/peerjs.min.js",
+      "integrity": "sha384-nlUQ8ZqCbvStErob+biJNzSgltf6urV3VGqhfIfzhmg9RXmpeRm76ELw0pYnKlTR"
+    },
+    {
+      "local": "lib/qrcode.js",
+      "package": "qrcode-generator",
+      "version": "1.4.4",
+      "file": "qrcode.js",
+      "integrity": "sha384-8FWZA6BGMXhsfO+BLtrJK0We6gg5o1JyO8xQm6peWDEUs17ACA5ziE/NIAkl9z2k"
+    }
+  ],
+  "allowedConnections": [
+    "wss://0.peerjs.com"
+  ]
+}
