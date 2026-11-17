@@ -28,8 +28,11 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
   lightning (shrinks everyone else), ink (splats the screens of the karts ahead), turbo, triple turbo and star.
   The further back you are, the better the item. Triple bananas and shells also block one hit.
 - Coins raise your top speed a little, up to 10; getting hit or falling off costs coins.
+- Original race music (synthesised in the browser, no audio files) plays from GO, speeds up on the final lap and
+  sparkles while you have a Star. Press M on the computer to turn it off or on. If there is no sound, click the
+  game screen once.
 
-No phone? Arrow keys steer, Up = gas, Down = brake, Shift = drift (and tricks), Space = item.
+No phone? Arrow keys steer, Up = gas, Down = brake, Shift = drift (and tricks), Space = item, M = music.
 
 ## How the phone talks to the computer
 
