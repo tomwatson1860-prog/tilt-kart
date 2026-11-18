@@ -34,6 +34,13 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
   sky. The run back down is twice as steep as the climb and very fast, with camera shake, speed lines and a
   slightly loose feel (only there; the other tracks drive normally). Three stretches freeze over at random and
   turn slippery for several seconds.
+- Karts: 12 original kart models (Sunburst Sprinter, Neon Phantom, Retro Rocket, Desert Drifter, Arctic Comet,
+  Volcano Viper, Garden Glider, Midnight Mach, Candy Circuit, Titan Torque, Cobalt Streak, Jungle Jumper), each with a
+  helmeted driver at the wheel, spinning wheels and steering front wheels. Player 1 drives the Sunburst Sprinter,
+  Player 2 the Cobalt Streak; the computer drivers get a different mix of the others every race.
+- Graphics: soft physically based materials lit by each track's own sky, real sun shadows, a glow on bright things
+  (lava, flames, sparks, headlights, item boxes), smoother scenery, detailed ground, glossy items. On a slow computer
+  the game lowers its own quality step by step (sharpness, then glow, then shadows, then resolution).
 - Each track has its own original soundtrack, made live in the browser: a bright, bouncy tune for Skyland Sprint,
   a dark, driving one with a castle bell for Inferno Keep (a low rumble joins while lava flows), and for Aurora Glacier a
   different tune each time you race there, in turn: its own airy theme, then public-domain carols arranged as

@@ -24,6 +24,12 @@ const srv = http.createServer((req, res) => {
 });
 const fails = []; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails.push(m); };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+// the game lowers its own graphics quality on slow machines (this headless browser draws in software);
+// let it settle before checks that depend on the frame rate
+async function settle(page) {
+  let last = -1, same = 0;
+  for (let t = 0; t < 30 && same < 3; t++) { await sleep(1500); const q = await page.evaluate(() => window.__tk ? window.__tk.quality() : -1).catch(() => -1); if (q === last) same++; else { same = 0; last = q; } }
+}
 
 (async () => {
   await new Promise(r => srv.listen(0, '127.0.0.1', r));
@@ -61,6 +67,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   host.on('console', m => { if (m.type() === 'error') errors.push(m.text()); }); host.on('pageerror', e => errors.push(String(e)));
   await enter(host, CODE);
   await host.waitForFunction(() => window.__tk && window.__tk.get().peerReady, null, { timeout: 40000 }).catch(() => { });
+  await settle(host);
   // the phone-steering checks run on Skyland Sprint, where a long tilt can't end in lava (the full race below still picks a random track)
   await host.evaluate(() => window.__tk && window.__tk.setTrack(0)).catch(() => { });
   const h0 = await host.evaluate(() => window.__tk ? window.__tk.get() : null);
@@ -127,8 +134,10 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await sleep(1600);
   const q1 = await host.evaluate(() => window.__tk.players().p2); await snap(host, '3b-split.png'); await snap(phoneB, '2d-phone-p2.png');
   ok(!q1.auto && q1.speed > 10 && q1.th - q0.th > 0.2, 'Player 2 drives their own kart (speed ' + q1.speed.toFixed(1) + ', heading change ' + (q1.th - q0.th).toFixed(2) + ')');
-  await phoneB.close(); await sleep(2200);
-  ok(await host.evaluate(() => window.__tk.get().paused && /Player 2/.test(document.getElementById('lobby-title').textContent)), "race pauses when Player 2's phone drops off");
+  await phoneB.close();
+  await host.waitForFunction(() => window.__tk.get().paused && /Player 2/.test(document.getElementById('lobby-title').textContent), null, { timeout: 8000 }).catch(() => { });
+  const ptl = await host.evaluate(() => (window.__tk.get().paused ? 'paused: ' : 'running: ') + document.getElementById('lobby-title').textContent);
+  ok(/^paused: .*Player 2/.test(ptl), "race pauses when Player 2's phone drops off (" + ptl + ')');
   await phone.close(); await sleep(2200);
   const d = await host.evaluate(() => window.__tk.get());
   ok(d.paused && !d.alive, 'race pauses when the phone drops off');
@@ -138,7 +147,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   if (process.argv.includes('--full')) {
     // drift + mini-turbo on Skyland Sprint, where a held hard turn can't end in lava (and a rescue would reset the charge)
     const dp = await open({ viewport: { width: 640, height: 360 } }, base);
-    await enter(dp, CODE); await dp.waitForFunction(() => window.__tk, null, { timeout: 40000 }); await dp.evaluate(() => window.__tk.setTrack(0)); await sleep(500);
+    await enter(dp, CODE); await dp.waitForFunction(() => window.__tk, null, { timeout: 40000 }); await dp.evaluate(() => window.__tk.setTrack(0)); await settle(dp);
     await dp.keyboard.down('ArrowUp');
     await dp.waitForFunction(() => { const s = window.__tk.get(); return s.phase === 'race' && s.lap === 0 && s.idx > 12 && s.speed > 30; }, null, { timeout: 60000 }).catch(() => { });
     await dp.keyboard.down('ArrowLeft'); await dp.keyboard.down('ShiftLeft');
@@ -152,7 +161,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await dp.close();
     // a whole race on whichever track comes up
     const solo = await open({ viewport: { width: 640, height: 360 } }, base);
-    await enter(solo, CODE); await solo.waitForFunction(() => window.__tk, null, { timeout: 40000 }); await sleep(500);
+    await enter(solo, CODE); await solo.waitForFunction(() => window.__tk, null, { timeout: 40000 }); await settle(solo);
     const trackName = await solo.evaluate(() => window.__tk.track().name);
     await solo.keyboard.down('ArrowUp');
     await solo.waitForFunction(() => window.__tk.get().phase === 'race', null, { timeout: 60000 }).catch(() => { });
