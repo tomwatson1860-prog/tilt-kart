@@ -46,8 +46,12 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
   slightly loose feel (only there; the other tracks drive normally). Three stretches freeze over at random and
   turn slippery for several seconds.
 - Karts: 12 original kart models (Sunburst Sprinter, Neon Phantom, Retro Rocket, Desert Drifter, Arctic Comet,
-  Volcano Viper, Garden Glider, Midnight Mach, Candy Circuit, Titan Torque, Cobalt Streak, Jungle Jumper), each with a
-  helmeted driver at the wheel, spinning wheels and steering front wheels. Each player picks their own kart on the
+  Volcano Viper, Garden Glider, Midnight Mach, Candy Circuit, Titan Torque, Cobalt Streak, Jungle Jumper). Each is a
+  sculpted, high-detail model built in the game: its own body shape (Grand Prix racer, wedge, 1950s streamliner, muscle
+  car, dune buggy or armoured truck), clear-coat paint with metallic flake and its own paint design and race number,
+  treaded tyres with sidewall lettering, its own rims with brake discs and callipers, and extras such as wings, roll
+  cages, exhausts, glowing lights and underglow. A helmeted driver in a matching race suit sits at the wheel; the
+  wheels spin and the front wheels steer. Each player picks their own kart on the
   Home screen; the computer drivers get a different mix of the others every race.
 - Graphics: soft physically based materials lit by each track's own sky, real sun shadows, a glow on bright things
   (lava, flames, sparks, headlights, item boxes), smoother scenery, detailed ground, glossy items. On a slow computer

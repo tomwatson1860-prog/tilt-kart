@@ -133,6 +133,19 @@ async function settle(page) {
   const home3 = await host.evaluate(() => window.__tk.choice());
   ok(home2.track === (home0.track + 1) % 4 && home3.track === home0.track && home3.trackName === home0.trackName, 'the phone changes the track and back (' + home0.trackName + ' → ' + home2.trackName + ' → ' + home3.trackName + ')');
   await host.evaluate(() => window.__tk.setTrack(0)).catch(() => { }); await settle(host);
+  // --- the kart showroom, opened from the Home screen ---
+  await host.click('#home-showroom');
+  await host.waitForFunction(() => window.__tk.showroom().open, null, { timeout: 30000 }).catch(() => { });
+  const sr0 = await host.evaluate(() => window.__tk.showroom());
+  await host.keyboard.press('ArrowRight');
+  await host.waitForFunction(c => window.__tk.showroom().cur !== c, sr0.cur, { timeout: 30000 }).catch(() => { });
+  const sr1 = await host.evaluate(() => window.__tk.showroom()); await sleep(2500); await snap(host, '1c-showroom.png');
+  await host.click('#sr-pick0');
+  await host.waitForFunction(() => !window.__tk.showroom().open, null, { timeout: 30000 }).catch(() => { });
+  const sr2 = await host.evaluate(() => ({ s: window.__tk.showroom(), c: window.__tk.choice() }));
+  ok(sr0.open && sr0.cur === home1.kart[0] && sr1.cur !== sr0.cur && !sr2.s.open && sr2.c.home && sr2.c.kart[0] === sr1.cur && sr2.c.p1kart === sr1.cur,
+    'the Home screen\'s showroom opens on Player 1\'s kart; choosing another there returns to the Home screen with it (kart ' + sr0.cur + ' → ' + sr2.c.kart[0] + ')');
+  await settle(host);
   await phone.dispatchEvent('#mstart', 'pointerdown', { pointerId: 2, bubbles: true });
   await host.waitForFunction(() => window.__tk.get().phase !== 'lobby', null, { timeout: 12000 }).catch(() => { });
   await phone.dispatchEvent('#gas', 'pointerdown', { pointerId: 1, bubbles: true });
