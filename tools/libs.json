@@ -23,6 +23,7 @@
     }
   ],
   "allowedConnections": [
-    "wss://0.peerjs.com"
+    "wss://0.peerjs.com",
+    "https://srjhknqvmhgpmytlkupe.supabase.co"
   ]
 }

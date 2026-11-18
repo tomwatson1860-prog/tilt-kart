@@ -36,11 +36,28 @@ async function settle(page) {
   const base = `http://127.0.0.1:${srv.address().port}/`, PP = 9000 + Math.floor(Math.random() * 500);
   PeerServer({ port: PP, path: '/', host: '127.0.0.1' });
   const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
-  const errors = [], outside = [], sockets = [];
+  const errors = [], outside = [], sockets = [], lbCalls = [];
+  // the leaderboard database is answered by a stand-in here, so check runs never add scores to the real board
+  const LB_ORIGIN = cfg.allowedConnections.find(x => /^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(x));
+  const FAKE_DB = [{ track: 'skyland', name: 'Ace', time_ms: 150000, kart: 3, created_at: '2026-01-01' }, { track: 'skyland', name: 'Zed', time_ms: 900000, kart: 6, created_at: '2026-01-02' }];
+  async function fakeLeaderboard(ctx) {
+    if (!LB_ORIGIN) return;
+    await ctx.route(LB_ORIGIN + '/**', async route => {
+      const rq = route.request(), u = new URL(rq.url()), h = rq.headers(); lbCalls.push(rq.method() + ' ' + u.pathname);
+      const cors = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': 'GET,POST,OPTIONS', 'access-control-expose-headers': 'Content-Range' };
+      if (rq.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
+      if (!h.apikey || h.authorization !== 'Bearer ' + h.apikey) return route.fulfill({ status: 401, headers: cors, body: '{}' });
+      const tr = (u.searchParams.get('track') || '').replace('eq.', '');
+      if (rq.method() === 'POST') { const e = JSON.parse(rq.postData() || '{}'); FAKE_DB.push(Object.assign({ created_at: new Date().toISOString() }, e)); return route.fulfill({ status: 201, headers: cors, body: '' }); }
+      if (u.searchParams.get('time_ms')) { const lt = +u.searchParams.get('time_ms').replace('lt.', ''); return route.fulfill({ status: 206, headers: Object.assign({ 'content-range': '0-0/' + FAKE_DB.filter(x => x.track === tr && x.time_ms < lt).length, 'content-type': 'application/json' }, cors), body: '[]' }); }
+      const rows = FAKE_DB.filter(x => x.track === tr).sort((a, c) => a.time_ms - c.time_ms).slice(0, +u.searchParams.get('limit') || 10);
+      return route.fulfill({ status: 200, headers: Object.assign({ 'content-type': 'application/json' }, cors), body: JSON.stringify(rows) });
+    });
+  }
   async function open(ctxOpts, url, quiet) {
-    const ctx = await browser.newContext(ctxOpts), page = await ctx.newPage();
+    const ctx = await browser.newContext(ctxOpts); await fakeLeaderboard(ctx); const page = await ctx.newPage();
     if (!quiet) { page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); }); page.on('pageerror', e => errors.push(String(e))); }
-    page.on('request', r => { if (!r.url().startsWith(base) && !r.url().startsWith('data:') && !r.url().startsWith('blob:')) outside.push(r.url()); });
+    page.on('request', r => { if (!r.url().startsWith(base) && !r.url().startsWith('data:') && !r.url().startsWith('blob:') && !(LB_ORIGIN && r.url().startsWith(LB_ORIGIN + '/rest/v1/'))) outside.push(r.url()); });
     await page.routeWebSocket(/.*/, ws => {
       sockets.push(ws.url());
       const u = new URL(ws.url()); if (u.host !== '0.peerjs.com') { ws.close(); return; }
@@ -97,6 +114,11 @@ async function settle(page) {
   await phone.waitForFunction(() => window.__tc.get().menu, null, { timeout: 8000 }).catch(() => { });
   const home0 = await host.evaluate(() => window.__tk.choice()), menu0 = await phone.evaluate(() => window.__tc.get());
   ok(home0.home && (await host.evaluate(() => window.__tk.get().phase)) === 'lobby' && menu0.menu && menu0.kart.length > 0, 'the game opens on the Home screen and the phone shows the kart & track menu (' + menu0.kart + ', ' + menu0.track + ')');
+  if (LB_ORIGIN) {
+    await host.waitForFunction(() => window.__tk.lb().home.length > 0, null, { timeout: 15000 }).catch(() => { });
+    const hb = await host.evaluate(() => window.__tk.lb());
+    ok(hb.on && hb.home.length === 2 && /Ace/.test(hb.home[0]), 'the Home screen shows the track\'s top times from the leaderboard (' + hb.home.join(' / ') + ')');
+  }
   await phone.dispatchEvent('#kn', 'pointerdown', { pointerId: 2, bubbles: true });
   await host.waitForFunction(k => window.__tk.choice().kart[0] !== k, home0.kart[0], { timeout: 8000 }).catch(() => { });
   const home1 = await host.evaluate(() => window.__tk.choice());
@@ -139,6 +161,21 @@ async function settle(page) {
   const pz2 = await host.evaluate(() => window.__tk.get().paused); await sleep(400);
   ok(pz1 && !pz2 && /RESUME/.test(plabel), "the phone's middle button pauses and resumes the race (button showed " + plabel + ')');
   await snap(phone, '2c-phone-racing.png');
+  // --- after a race the phone asks for a name for the leaderboard; it is saved and highlighted ---
+  if (LB_ORIGIN) {
+    await host.evaluate(() => window.__tk.finishTest());
+    await phone.waitForFunction(() => window.__tc.get().ask, null, { timeout: 10000 }).catch(() => { });
+    const asked = await phone.evaluate(() => window.__tc.get().ask); await snap(phone, '2e-phone-name.png');
+    await phone.fill('#nbin', 'Check Racer'); await phone.dispatchEvent('#nbok', 'pointerdown', { pointerId: 2, bubbles: true });
+    await host.waitForFunction(() => window.__tk.lb().board.some(r => r.startsWith('*') && /Check Racer/.test(r)), null, { timeout: 15000 }).catch(() => { });
+    const lb1 = await host.evaluate(() => window.__tk.lb()); await phone.waitForFunction(() => /#\d/.test(window.__tc.get().lbs), null, { timeout: 8000 }).catch(() => { });
+    const lbs = await phone.evaluate(() => window.__tc.get().lbs); await snap(host, '3c-leaderboard.png');
+    const row = FAKE_DB.find(x => x.name === 'Check Racer');
+    ok(asked && row && row.track === 'skyland' && row.time_ms > 60000 && lb1.board.some(r => r.startsWith('*') && /Check Racer/.test(r)) && lbs.includes('#' + (FAKE_DB.filter(x => x.track === 'skyland' && row && x.time_ms < row.time_ms).length + 1) + ' '), 'after a race the phone asks for a name; it is saved, ranked and highlighted (' + lbs + ')');
+    await phone.dispatchEvent('#pause', 'pointerdown', { pointerId: 3, bubbles: true });
+    await host.waitForFunction(() => window.__tk.get().phase === 'race', null, { timeout: 20000 }).catch(() => { });
+    ok((await host.evaluate(() => window.__tk.get().phase)) === 'race', 'the middle button races again after the results');
+  }
   // --- a second phone joins as Player 2: split screen, its own kart ---
   const phoneB = await open({ viewport: { width: 780, height: 360 }, isMobile: true, hasTouch: true }, link);
   await phoneB.waitForFunction(() => window.__tc, null, { timeout: 30000 }).catch(() => { });
@@ -200,13 +237,22 @@ async function settle(page) {
     ok(gotItem && usedItem, 'item boxes hand out items that can be used');
     ok(last.phase === 'finished', 'a full race can be finished (time ' + last.raceT.toFixed(1) + 's, place ' + last.place + ')');
     await sleep(500); await snap(solo, '5-finish.png');
-    await solo.keyboard.up('ArrowUp'); await solo.keyboard.press('KeyH');
+    await solo.keyboard.up('ArrowUp');
+    if (LB_ORIGIN) {
+      await solo.waitForSelector('#lb-ask input', { timeout: 10000 }).catch(() => { });
+      await solo.fill('#lb-ask input', 'Keyboard Kid'); await solo.press('#lb-ask input', 'Enter');
+      await solo.waitForFunction(() => window.__tk.lb().board.some(r => r.startsWith('*') && /Keyboard Kid/.test(r)), null, { timeout: 15000 }).catch(() => { });
+      const lb2 = await solo.evaluate(() => window.__tk.lb());
+      ok(lb2.board.some(r => r.startsWith('*') && /Keyboard Kid/.test(r)) && (await solo.evaluate(() => window.__tk.get().phase)) === 'finished', 'a keyboard racer can type a name on the computer; it is saved and highlighted');
+    }
+    await solo.keyboard.press('KeyH');
     await solo.waitForFunction(() => window.__tk.get().phase === 'lobby' && window.__tk.choice().home, null, { timeout: 15000 }).catch(() => { });
     ok(await solo.evaluate(() => window.__tk.get().phase === 'lobby' && window.__tk.choice().home), 'after a race, HOME goes back to the Home screen');
     await solo.close();
   }
 
   ok(errors.length === 0, 'no console, CSP or integrity errors' + (errors.length ? ': ' + errors.slice(0, 3).join(' | ') : ''));
+  if (LB_ORIGIN) ok(lbCalls.length > 0, 'leaderboard requests go only to the approved database (' + lbCalls.length + ' answered by the stand-in, none left this machine)');
   ok(outside.length === 0, 'no requests to other servers' + (outside.length ? ': ' + outside.slice(0, 3).join(', ') : ''));
   const badSock = sockets.filter(u => !cfg.allowedConnections.some(x => u.startsWith(x + '/')));
   ok(sockets.length > 0 && badSock.length === 0, 'only the approved pairing socket is opened' + (badSock.length ? ': ' + badSock[0] : ''));

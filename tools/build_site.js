@@ -69,14 +69,22 @@ if (!gate.includes('<meta name="referrer" content="no-referrer">') || !/noindex,
 if (/(?:src|href)="\s*(?:https?:)?\/\//i.test(gate)) fail('tools/gate.html loads something from another server');
 if (gate.includes(code)) fail('the access code appears in tools/gate.html');
 
-const indexParts = { GAME_JS: inline(read('game.js')) };
+// leaderboard database (Supabase): address and public key from LB_URL / LB_KEY, or the source's config.json.
+// They end up only inside the encrypted page; the address must be an approved connection (it is in the CSP).
+let lbCfg = {}; try { lbCfg = JSON.parse(read('config.json')).leaderboard || {}; } catch (e) { }
+const LB_URL = process.env.LB_URL !== undefined ? process.env.LB_URL : (lbCfg.url || ''), LB_KEY = process.env.LB_KEY !== undefined ? process.env.LB_KEY : (lbCfg.key || '');
+if (LB_URL && !/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(LB_URL)) fail('LB_URL must look like https://<project>.supabase.co');
+if (LB_URL && !cfg.allowedConnections.includes(LB_URL)) fail('LB_URL is not in allowedConnections in tools/libs.json, so the browser would block it');
+if (LB_KEY && !/^[A-Za-z0-9._-]{20,}$/.test(LB_KEY)) fail('LB_KEY does not look like a Supabase public key');
+if (/service_role|sb_secret_/.test(LB_KEY) || (LB_KEY.split('.').length === 3 && /service_role/.test(Buffer.from(LB_KEY.split('.')[1], 'base64').toString()))) fail('LB_KEY is a secret (service) key – use the public anon / publishable key');
+const indexParts = { GAME_JS: inline(read('game.js')), LB_URL: LB_URL, LB_KEY: LB_KEY };
 for (const m of read('index.html').matchAll(/\{\{MAP_B64:([a-z0-9-]+\.glb)\}\}/g)) indexParts['MAP_B64:' + m[1]] = fs.readFileSync(path.join(src, 'assets', m[1])).toString('base64');
-if (Object.keys(indexParts).length < 2) fail('index.html names no map files');
+if (Object.keys(indexParts).length < 4) fail('index.html names no map files');
 const pages = {
   'index.html': assemble('index.html', indexParts),
   'controller.html': assemble('controller.html', { CONTROLLER_JS: inline(read('controller.js')) })
 };
-const res = { ok: true, pages: {}, outsideLoads: 0 };
+const res = { ok: true, pages: {}, outsideLoads: 0, leaderboard: LB_URL ? 'on' : 'off' };
 for (const name in pages) {
   const out = gate.replace('/*PAYLOAD*/', () => seal(Buffer.from(pages[name].page, 'utf8')));
   for (const marker of ['parseGLB', 'stepKart', 'deviceorientation', 'Z2xURg', 'tiltkart-c-']) if (out.includes(marker)) fail(name + ': readable game code found in the output (' + marker + ')');

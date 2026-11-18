@@ -1,4 +1,4 @@
-# Tilt Kart
+# Tommio Kart
 
 Website: https://tomwatson1860-prog.github.io/tilt-kart/
 
@@ -27,6 +27,10 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
    for 15 seconds its kart goes back to a computer driver. The results show both players and who won the duel.
 6. After a race: RACE AGAIN (the phone's middle button, Enter) runs the same track again (or a new one on
    Random); HOME (on the phone, or H) goes back to the Home screen.
+7. Leaderboard: after a race, each player who finished is asked for a name (on their phone, or in the box on
+   the computer; Skip is fine). The time goes on a shared online leaderboard for that track, and the results show
+   the track's top 10 with your new time highlighted and your overall rank. The Home screen shows the top 5 for the
+   chosen track.
 
 - Three tracks, chosen on the Home screen (or Random: a different one each race, never the same twice in a row):
   Skyland Sprint, Inferno Keep and Aurora Glacier. Scenery comes from each track's map file; each has its own road layout and landmark.
@@ -108,3 +112,14 @@ refused. The access code is never stored in this repository.
   never leaves it.
 - A short access code only keeps casual visitors out: the encrypted page can be saved and every code tried
   offline. Use a long random code if the game ever needs real protection.
+
+## Leaderboard database
+
+The leaderboard lives in a free Supabase project (Postgres). Only its address is in this repository (it is an
+approved connection in `tools/libs.json` and the pages' Content Security Policy); the public "publishable" key is
+added at build time from `LB_URL` / `LB_KEY` or the source's `config.json`, and ends up only inside the encrypted
+page. The `scores` table accepts only sensible entries (a known track, a name of 1-16 characters without `<` or `>`,
+a realistic time, kart 1-12) and the public key can only read and add rows: changing or deleting entries, or
+back-dating them, is refused. To remove a name, delete its row in the Supabase dashboard (Table Editor, `scores`).
+Free Supabase projects pause after a week with no activity; if the leaderboard stops loading after a quiet spell,
+sign in to Supabase and restore the project (no scores are lost).
