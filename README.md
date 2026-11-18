@@ -14,12 +14,19 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
 1. Open the website on a computer and enter the access code.
 2. Scan the QR code with a phone and tap **Start** (allow motion access if asked). The QR
    link carries the access code, so the phone does not ask for it.
-3. Hold the phone sideways. Tilt to steer, right thumb = **GAS**, left thumb = **DRIFT** (top) and **ITEM**
+3. The Home screen comes first. Pick your kart (12 to choose from) and a track (Skyland Sprint, Inferno Keep,
+   Aurora Glacier, or Random for a different one every race) on the phone's menu, or with the mouse or arrow keys
+   on the computer. The camera circles your kart on the start line of the chosen track. Press START (Enter on the
+   keyboard) to race. Your picks are remembered on that computer.
+4. Hold the phone sideways. Tilt to steer, right thumb = **GAS**, left thumb = **DRIFT** (top) and **ITEM**
    (bottom). The big middle button starts a race, then pauses and resumes it (P on the keyboard does the same).
-4. Two players: a second phone scans the same QR code and joins as Player 2. The screen splits top / bottom,
+5. Two players: a second phone scans the same QR code and joins as Player 2, picking their own kart on the
+   Home screen (Player 1 picks the track). The screen splits top / bottom,
    each half following one player's kart with its own items, place and lap (the four computer drivers still race).
    Either phone can start or pause. If a phone drops mid-race the race pauses; if Player 2's phone stays away
    for 15 seconds its kart goes back to a computer driver. The results show both players and who won the duel.
+6. After a race: RACE AGAIN (the phone's middle button, Enter) runs the same track again (or a new one on
+   Random); HOME (on the phone, or H) goes back to the Home screen.
 
 - Three tracks, picked at random for each race (never the same one twice in a row): Skyland Sprint, Inferno Keep
   and Aurora Glacier. Scenery comes from each track's map file; each has its own road layout and landmark.
@@ -36,8 +43,8 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
   turn slippery for several seconds.
 - Karts: 12 original kart models (Sunburst Sprinter, Neon Phantom, Retro Rocket, Desert Drifter, Arctic Comet,
   Volcano Viper, Garden Glider, Midnight Mach, Candy Circuit, Titan Torque, Cobalt Streak, Jungle Jumper), each with a
-  helmeted driver at the wheel, spinning wheels and steering front wheels. Player 1 drives the Sunburst Sprinter,
-  Player 2 the Cobalt Streak; the computer drivers get a different mix of the others every race.
+  helmeted driver at the wheel, spinning wheels and steering front wheels. Each player picks their own kart on the
+  Home screen; the computer drivers get a different mix of the others every race.
 - Graphics: soft physically based materials lit by each track's own sky, real sun shadows, a glow on bright things
   (lava, flames, sparks, headlights, item boxes), smoother scenery, detailed ground, glossy items. On a slow computer
   the game lowers its own quality step by step (sharpness, then glow, then shadows, then resolution).

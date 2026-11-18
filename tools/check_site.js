@@ -93,9 +93,29 @@ async function settle(page) {
   ok((await host.evaluate(() => window.__tk.get().alive)), 'phone pairs with the game');
   await sleep(600); await snap(phone, '2-phone.png');
 
+  // --- the Home screen: pick a kart and a track from the phone, then START ---
+  await phone.waitForFunction(() => window.__tc.get().menu, null, { timeout: 8000 }).catch(() => { });
+  const home0 = await host.evaluate(() => window.__tk.choice()), menu0 = await phone.evaluate(() => window.__tc.get());
+  ok(home0.home && (await host.evaluate(() => window.__tk.get().phase)) === 'lobby' && menu0.menu && menu0.kart.length > 0, 'the game opens on the Home screen and the phone shows the kart & track menu (' + menu0.kart + ', ' + menu0.track + ')');
+  await phone.dispatchEvent('#kn', 'pointerdown', { pointerId: 2, bubbles: true });
+  await host.waitForFunction(k => window.__tk.choice().kart[0] !== k, home0.kart[0], { timeout: 8000 }).catch(() => { });
+  const home1 = await host.evaluate(() => window.__tk.choice());
+  await phone.waitForFunction(n => window.__tc.get().kart !== n, menu0.kart, { timeout: 5000 }).catch(() => { });
+  const menu1 = await phone.evaluate(() => window.__tc.get()); await snap(phone, '2-phone-home.png'); await snap(host, '1b-home.png');
+  ok(home1.kart[0] !== home0.kart[0] && home1.p1kart === home1.kart[0] && menu1.kart !== menu0.kart, 'the phone changes Player 1\'s kart, on the start line too (' + menu0.kart + ' → ' + menu1.kart + ')');
+  await phone.dispatchEvent('#tn', 'pointerdown', { pointerId: 2, bubbles: true });
+  await host.waitForFunction(t => window.__tk.choice().track !== t, home0.track, { timeout: 30000 }).catch(() => { });
+  const home2 = await host.evaluate(() => window.__tk.choice());
+  await phone.dispatchEvent('#tp', 'pointerdown', { pointerId: 2, bubbles: true });
+  await host.waitForFunction(t => window.__tk.choice().track === t, home0.track, { timeout: 30000 }).catch(() => { });
+  const home3 = await host.evaluate(() => window.__tk.choice());
+  ok(home2.track === (home0.track + 1) % 4 && home3.track === home0.track && home3.trackName === home0.trackName, 'the phone changes the track and back (' + home0.trackName + ' → ' + home2.trackName + ' → ' + home3.trackName + ')');
+  await host.evaluate(() => window.__tk.setTrack(0)).catch(() => { }); await settle(host);
+  await phone.dispatchEvent('#mstart', 'pointerdown', { pointerId: 2, bubbles: true });
+  await host.waitForFunction(() => window.__tk.get().phase !== 'lobby', null, { timeout: 12000 }).catch(() => { });
   await phone.dispatchEvent('#gas', 'pointerdown', { pointerId: 1, bubbles: true });
   await host.waitForFunction(() => window.__tk.get().phase === 'race', null, { timeout: 12000 }).catch(() => { });
-  ok((await host.evaluate(() => window.__tk.get().phase)) === 'race', 'GAS on the phone starts the race');
+  ok((await host.evaluate(() => window.__tk.get().phase)) === 'race' && !(await host.evaluate(() => window.__tk.choice().home)), 'START on the phone starts the race');
   await host.waitForFunction(() => { const s = window.__tk.get(); return s.lap === 0 && s.idx > 12 && s.speed > 20; }, null, { timeout: 30000 }).catch(() => { });
   await sleep(500);
   const a = await host.evaluate(() => window.__tk.get());
@@ -148,6 +168,7 @@ async function settle(page) {
     // drift + mini-turbo on Skyland Sprint, where a held hard turn can't end in lava (and a rescue would reset the charge)
     const dp = await open({ viewport: { width: 640, height: 360 } }, base);
     await enter(dp, CODE); await dp.waitForFunction(() => window.__tk, null, { timeout: 40000 }); await dp.evaluate(() => window.__tk.setTrack(0)); await settle(dp);
+    await dp.keyboard.press('Enter'); await dp.waitForFunction(() => window.__tk.get().phase !== 'lobby', null, { timeout: 20000 }).catch(() => { });
     await dp.keyboard.down('ArrowUp');
     await dp.waitForFunction(() => { const s = window.__tk.get(); return s.phase === 'race' && s.lap === 0 && s.idx > 12 && s.speed > 30; }, null, { timeout: 60000 }).catch(() => { });
     await dp.keyboard.down('ArrowLeft'); await dp.keyboard.down('ShiftLeft');
@@ -163,6 +184,7 @@ async function settle(page) {
     const solo = await open({ viewport: { width: 640, height: 360 } }, base);
     await enter(solo, CODE); await solo.waitForFunction(() => window.__tk, null, { timeout: 40000 }); await settle(solo);
     const trackName = await solo.evaluate(() => window.__tk.track().name);
+    await solo.keyboard.press('Enter'); await solo.waitForFunction(() => window.__tk.get().phase !== 'lobby', null, { timeout: 20000 }).catch(() => { });
     await solo.keyboard.down('ArrowUp');
     await solo.waitForFunction(() => window.__tk.get().phase === 'race', null, { timeout: 60000 }).catch(() => { });
     // the rest of the race: the game's own driver steers (as a phone would, smoothly); items are still used with Space
@@ -177,7 +199,11 @@ async function settle(page) {
     console.log('     race on ' + trackName + ': ' + st.map(k => k.name + ' ' + (k.fin !== null ? k.fin + 's' : 'lap ' + k.lap) + ' hits ' + k.hits + ' falls ' + k.falls).join(' | '));
     ok(gotItem && usedItem, 'item boxes hand out items that can be used');
     ok(last.phase === 'finished', 'a full race can be finished (time ' + last.raceT.toFixed(1) + 's, place ' + last.place + ')');
-    await sleep(500); await snap(solo, '5-finish.png'); await solo.close();
+    await sleep(500); await snap(solo, '5-finish.png');
+    await solo.keyboard.up('ArrowUp'); await solo.keyboard.press('KeyH');
+    await solo.waitForFunction(() => window.__tk.get().phase === 'lobby' && window.__tk.choice().home, null, { timeout: 15000 }).catch(() => { });
+    ok(await solo.evaluate(() => window.__tk.get().phase === 'lobby' && window.__tk.choice().home), 'after a race, HOME goes back to the Home screen');
+    await solo.close();
   }
 
   ok(errors.length === 0, 'no console, CSP or integrity errors' + (errors.length ? ': ' + errors.slice(0, 3).join(' | ') : ''));
