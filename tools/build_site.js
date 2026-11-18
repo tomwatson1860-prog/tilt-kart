@@ -16,6 +16,10 @@
      url(http...) or fetch("http...").
    - The code screen (tools/gate.html) carries a Content Security Policy that only allows this site's own
      files, the pages' inline code and the one approved phone-pairing connection (wss://0.peerjs.com).
+   - Optional tools/head.html (home-screen icon, app manifest, full-screen mode) may only hold <link>/<meta>
+     tags pointing at files on this site; the icon must be an opaque 180x180 PNG and the manifest may not
+     point anywhere else. The tags go into the code screen (at <!--HEAD--> in tools/gate.html) and into both
+     unlocked pages, because a phone reads them from whatever page is showing.
  Each page (with its game code and the race-track file bundled in) is gzipped and encrypted with
  AES-256-GCM (key from the access code via PBKDF2-SHA-256, 1,000,000 iterations, fresh salt and IV), put
  into the code screen, and decrypted again to check it. The access code is read from the environment only;
@@ -29,7 +33,7 @@ if (!src) fail('usage: ACCESS_CODE=<code> node tools/build_site.js <source folde
 if (!code) fail('ACCESS_CODE is not set');
 const sri = b => 'sha384-' + crypto.createHash('sha384').update(b).digest('base64');
 const cfg = JSON.parse(fs.readFileSync(path.join(__dirname, 'libs.json'), 'utf8')), libs = cfg.libs;
-const CSP = "default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' " + cfg.allowedConnections.join(' ') + "; base-uri 'none'; form-action 'none'";
+const CSP = "default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' " + cfg.allowedConnections.join(' ') + "; manifest-src 'self'; base-uri 'none'; form-action 'none'";
 
 for (const l of libs) if (sri(fs.readFileSync(path.join(ROOT, l.local))) !== l.integrity) fail(l.local + ' does not match its fingerprint in tools/libs.json');
 
@@ -62,12 +66,55 @@ function seal(buf) {
   return JSON.stringify({ v: 1, iter, salt: salt.toString('base64'), iv: iv.toString('base64'), ct: ct.toString('base64') });
 }
 
+// home-screen icon and app mode: tools/head.html goes into the code screen and the unlocked pages
+const headPath = path.join(__dirname, 'head.html');
+const pngInfo = f => { const b = fs.readFileSync(f); return b.length > 26 && b.toString('latin1', 1, 4) === 'PNG' ? { w: b.readUInt32BE(16), h: b.readUInt32BE(20), colour: b[25] } : null; };
+const local = (u, what) => { if (typeof u !== 'string' || !u || /^[a-z][a-z0-9+.-]*:|^\/\/|^\/|\.\./i.test(u)) fail(what + ' must point to a file on this site: ' + u); const f = path.join(ROOT, u.split(/[?#]/)[0]); if (!fs.existsSync(f)) fail(what + ' is missing: ' + u); return f; };
+let headTags = '', homeScreen = null;
+if (fs.existsSync(headPath)) {
+  headTags = fs.readFileSync(headPath, 'utf8').trim();
+  const other = headTags.replace(/<!--[\s\S]*?-->/g, '').replace(/<(?:link|meta)\b[^>]*>/gi, '').trim();
+  if (other) fail('tools/head.html may only hold <link> and <meta> tags, found: ' + other.slice(0, 80));
+  if (/(?:https?:)?\/\/|javascript:/i.test(headTags.replace(/<!--[\s\S]*?-->/g, ''))) fail('tools/head.html points to another server');
+  homeScreen = {};
+  for (const m of headTags.matchAll(/<link\b[^>]*>/gi)) {
+    const rel = (m[0].match(/\brel="([^"]+)"/i) || [])[1], href = (m[0].match(/\bhref="([^"]+)"/i) || [])[1];
+    if (!['apple-touch-icon', 'icon', 'manifest'].includes(rel)) fail('tools/head.html: unexpected <link rel="' + rel + '">');
+    const f = local(href, 'tools/head.html ' + rel);
+    if (rel === 'apple-touch-icon') {
+      const p = pngInfo(f);
+      if (!p || p.w !== 180 || p.h !== 180) fail('the home-screen icon must be a 180x180 PNG: ' + href);
+      if (p.colour !== 2) fail('the home-screen icon must be opaque RGB (iPhones show transparent parts as black): ' + href);
+      homeScreen.icon = p.w + 'x' + p.h;
+    }
+    if (rel === 'manifest') {
+      let man; try { man = JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { fail(href + ' does not parse: ' + e.message); }
+      const walk = v => typeof v === 'string' ? (/^[a-z][a-z0-9+.-]*:|^\/\//i.test(v) && fail(href + ' points to another server: ' + v)) : v && typeof v === 'object' && Object.values(v).forEach(walk);
+      walk(man);
+      if (man.start_url !== './' || man.scope !== './') fail(href + ': start_url and scope must be "./"');
+      if (!man.short_name || man.short_name.length > 12) fail(href + ': short_name must be 1-12 characters so it fits under the icon');
+      for (const ic of man.icons || []) { const p = pngInfo(local(ic.src, href + ' icon')); if (!p || ic.sizes !== p.w + 'x' + p.h) fail(href + ': ' + ic.src + ' is not a ' + ic.sizes + ' PNG'); }
+      homeScreen.manifest = { name: man.short_name, display: man.display, icons: (man.icons || []).length };
+    }
+  }
+  if (!homeScreen.icon) fail('tools/head.html has no apple-touch-icon');
+  homeScreen.title = (headTags.match(/name="apple-mobile-web-app-title" content="([^"]*)"/) || [])[1];
+}
+function withHead(page) {      // the unlocked page replaces the code screen, so it carries the same tags
+  if (!headTags) return page;
+  page = page.replace(/<link\b[^>]*\brel="(?:apple-touch-icon|icon|shortcut icon|manifest)"[^>]*>\s*|<meta\b[^>]*\bname="(?:apple-mobile-web-app-[a-z-]+|mobile-web-app-capable|theme-color)"[^>]*>\s*/gi, '');
+  if ((page.match(/<head\b[^>]*>/gi) || []).length !== 1) fail('each page must contain exactly one <head> tag');
+  return page.replace(/<head\b[^>]*>/i, h => h + '\n' + headTags + '\n');
+}
+
 const gate = fs.readFileSync(path.join(__dirname, 'gate.html'), 'utf8');
 if (gate.split('/*PAYLOAD*/').length !== 2) fail('tools/gate.html must contain /*PAYLOAD*/ exactly once');
 if (!gate.includes('<meta http-equiv="Content-Security-Policy" content="' + CSP + '">')) fail('tools/gate.html has lost its Content Security Policy (or it was changed)');
 if (!gate.includes('<meta name="referrer" content="no-referrer">') || !/noindex,nofollow/.test(gate)) fail('tools/gate.html has lost its referrer or noindex tag');
 if (/(?:src|href)="\s*(?:https?:)?\/\//i.test(gate)) fail('tools/gate.html loads something from another server');
 if (gate.includes(code)) fail('the access code appears in tools/gate.html');
+if (headTags && gate.split('<!--HEAD-->').length !== 2) fail('tools/gate.html must contain <!--HEAD--> exactly once (where tools/head.html goes)');
+const gateOut = gate.replace(/<!--HEAD-->\n?/, () => headTags ? headTags + '\n' : '');
 
 // leaderboard database (Supabase): address and public key from LB_URL / LB_KEY, or the source's config.json.
 // They end up only inside the encrypted page; the address must be an approved connection (it is in the CSP).
@@ -86,7 +133,8 @@ const pages = {
 };
 const res = { ok: true, pages: {}, outsideLoads: 0, leaderboard: LB_URL ? 'on' : 'off' };
 for (const name in pages) {
-  const out = gate.replace('/*PAYLOAD*/', () => seal(Buffer.from(pages[name].page, 'utf8')));
+  pages[name].page = withHead(pages[name].page);
+  const out = gateOut.replace('/*PAYLOAD*/', () => seal(Buffer.from(pages[name].page, 'utf8')));
   for (const marker of ['parseGLB', 'stepKart', 'deviceorientation', 'Z2xURg', 'tiltkart-c-']) if (out.includes(marker)) fail(name + ': readable game code found in the output (' + marker + ')');
   fs.writeFileSync(path.join(ROOT, name), out);
   res.pages[name] = { bytes: out.length, fingerprintedLibs: pages[name].used };
@@ -98,4 +146,5 @@ const files = {};
 fs.writeFileSync(path.join(ROOT, 'source.enc'), seal(Buffer.from(JSON.stringify(files), 'utf8')) + '\n');
 fs.writeFileSync(path.join(ROOT, '.nojekyll'), '');
 res.sourceFiles = Object.keys(files).length;
+if (homeScreen) res.homeScreen = homeScreen;
 console.log(JSON.stringify(res));

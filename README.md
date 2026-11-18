@@ -80,6 +80,22 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
 
 No phone? Arrow keys steer, Up = gas, Down = brake, Shift = drift (and tricks), Space = item, M = music.
 
+## Play on a phone by itself
+
+Open the website on a phone and tap **PLAY ON THIS PHONE**: the phone is the screen and the wheel, racing the computer
+karts (one player). Hold it sideways and tilt it to steer; GAS is under the right thumb, DRIFT and ITEM under the left,
+and the pause button (top right) has re-centre, flip tilt, music and quit. If a phone won't share its tilt sensor,
+holding GAS and sliding that thumb sideways steers instead. A tablet can choose to be the big screen instead, with
+phones as wheels as usual. Graphics start lighter on phones and step down further by themselves if needed.
+
+## Home-screen icon
+
+Add the site to a phone's home screen (iPhone: Safari, Share, Add to Home Screen) and it shows the Tommio Kart logo,
+named "Tommio Kart", and opens full screen like an app. The icons are in `icons/`, the app details in
+`manifest.webmanifest`, and the tags in `tools/head.html`; `build_site.js` puts them on the code screen and both game
+pages and stops if an icon is the wrong size, see-through, or anything points to another server. If an older
+home-screen link exists, delete it and add it again so the phone picks up the new icon.
+
 ## How the phone talks to the computer
 
 The two pages find each other through the public PeerJS pairing service (`wss://0.peerjs.com`), then connect
@@ -110,7 +126,7 @@ refused. The access code is never stored in this repository.
   qrcode-generator 1.4.4) are in `lib/`, with their licences. Each is fingerprinted (Subresource Integrity,
   SHA-384), so a browser refuses any copy that has been altered.
 - The code screen sets a Content Security Policy that blocks loading anything from other servers, with one
-  exception: the phone-pairing connection to `wss://0.peerjs.com`. The phone-to-computer link itself (WebRTC) and its
+  exception: the phone-pairing connection to `wss://0.peerjs.com`. The app manifest may load from this site only. The phone-to-computer link itself (WebRTC) and its
   helper servers are not covered by that policy. No referrer is sent.
 - No cookies, analytics or forms that send data; the access code is checked in the visitor's browser and
   never leaves it.

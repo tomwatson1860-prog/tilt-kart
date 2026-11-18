@@ -6,6 +6,8 @@
 //  - the browser contacts no other server except the approved pairing socket; no CSP / integrity / script errors
 //  - deliberately altered copies of every fingerprinted file, and an altered encrypted page, are refused
 //  - no readable game code or access code is left in the published files
+//  - if the site has a home-screen icon: both code screens and both unlocked pages carry it (180x180) and
+//    full-screen mode, and the app manifest loads through the pages' security policy with all its icons
 // Usage: ACCESS_CODE=<code> NODE_PATH=<folder with playwright, peer and ws> node tools/check_site.js [--full] [--shots <folder>]
 const http = require('http'), fs = require('fs'), path = require('path');
 const { chromium } = require('playwright'), WebSocket = require('ws'), { PeerServer } = require('peer');
@@ -13,17 +15,42 @@ const root = path.join(__dirname, '..'), cfg = JSON.parse(fs.readFileSync(path.j
 const CODE = process.env.ACCESS_CODE; if (!CODE) { console.error('ACCESS_CODE is not set'); process.exit(1); }
 const si = process.argv.indexOf('--shots'), shots = si > 0 ? process.argv[si + 1] : null; if (shots) fs.mkdirSync(shots, { recursive: true });
 const snap = async (page, name) => { if (shots) await page.screenshot({ path: path.join(shots, name) }); };
-const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.txt': 'text/plain' };
+const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.txt': 'text/plain', '.png': 'image/png', '.webmanifest': 'application/manifest+json' };
 let tamper = null;
 const srv = http.createServer((req, res) => {
   const rel = decodeURIComponent(req.url.split('?')[0]).replace(/^\/+/, '') || 'index.html', file = path.join(root, rel);
-  if (!file.startsWith(root) || !/^(index\.html|controller\.html|lib\/)/.test(rel) || !fs.existsSync(file)) { res.writeHead(404); return res.end(); }
+  if (!file.startsWith(root) || !/^(index\.html|controller\.html|lib\/|icons\/[a-z0-9-]+\.png$|manifest\.webmanifest$)/.test(rel) || !fs.existsSync(file)) { res.writeHead(404); return res.end(); }
   let b = fs.readFileSync(file);
   if (tamper === rel) b = rel.endsWith('.html') ? Buffer.from(b.toString('utf8').replace(/"ct":"(.{40})(.)/, (m, a, c) => '"ct":"' + a + (c === 'A' ? 'B' : 'A'))) : Buffer.concat([b, Buffer.from('\n;')]);
   res.writeHead(200, { 'content-type': TYPES[path.extname(file)] || 'application/octet-stream' }); res.end(b);
 });
 const fails = []; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails.push(m); };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+const wantsIcon = /rel="apple-touch-icon"/.test(fs.readFileSync(path.join(root, 'index.html'), 'utf8'));
+// home-screen icon and app mode, as a phone reads them from whatever page is showing
+const homeScreen = p => p.evaluate(async () => {
+  const q = s => document.querySelector(s), size = href => new Promise(res => { const im = new Image(); im.onload = () => res(im.naturalWidth + 'x' + im.naturalHeight); im.onerror = () => res('failed'); im.src = href; });
+  const icon = q('link[rel="apple-touch-icon"]');
+  return { icon: icon ? await size(icon.href) : 'missing', manifestLinked: !!q('link[rel="manifest"]'),
+    appMode: (q('meta[name="apple-mobile-web-app-capable"]') || {}).content || 'missing', title: (q('meta[name="apple-mobile-web-app-title"]') || {}).content || 'missing' };
+});
+async function checkHome(p, gateHome, which) {        // the same icon and app mode on the code screen and on the unlocked page
+  const problems = [], pageHome = await homeScreen(p);
+  for (const [where, h] of [['code screen', gateHome], ['unlocked page', pageHome]]) {
+    if (h.icon !== '180x180') problems.push(where + ': home-screen icon ' + h.icon);
+    if (h.appMode !== 'yes') problems.push(where + ': full-screen (app) mode is ' + h.appMode);
+    if (!h.manifestLinked) problems.push(where + ': no app manifest');
+  }
+  const cdp = await p.context().newCDPSession(p), am = await cdp.send('Page.getAppManifest');
+  let man = null; try { man = JSON.parse(am.data || ''); } catch (e) { }
+  if (!man) problems.push('the app manifest did not load' + (am.errors && am.errors.length ? ': ' + am.errors.map(e => e.message).join(' | ') : ''));
+  else {
+    const sizes = await p.evaluate(async list => Promise.all(list.map(ic => new Promise(res => { const im = new Image(); im.onload = () => res(ic.sizes === im.naturalWidth + 'x' + im.naturalHeight ? 'ok' : ic.src + ' is ' + im.naturalWidth + 'x' + im.naturalHeight); im.onerror = () => res(ic.src + ' failed'); im.src = new URL(ic.src, location.href).href; }))), man.icons || []);
+    sizes.filter(s => s !== 'ok').forEach(s => problems.push('manifest icon ' + s));
+    if (man.display !== 'standalone') problems.push('manifest display is ' + man.display);
+  }
+  ok(problems.length === 0, which + ': home-screen icon ' + pageHome.icon + ', title "' + pageHome.title + '", app mode, manifest ' + (man ? man.short_name + ' with ' + (man.icons || []).length + ' icons' : 'not loaded') + (problems.length ? ' – ' + problems.join('; ') : ''));
+}
 // the game lowers its own graphics quality on slow machines (this headless browser draws in software);
 // let it settle before checks that depend on the frame rate
 async function settle(page) {
@@ -79,6 +106,7 @@ async function settle(page) {
 
   // --- computer page: code screen ---
   const host = await open({ viewport: { width: 960, height: 540 } }, base, true);
+  const hostGateHome = wantsIcon ? await homeScreen(host) : null;
   await enter(host, wrong); await host.waitForFunction(() => /not right/.test(document.getElementById('err').textContent), null, { timeout: 30000 }).catch(() => { });
   ok(await host.evaluate(() => !window.__tk && /not right/.test(document.getElementById('err').textContent)), 'a wrong access code is refused on the game page');
   host.on('console', m => { if (m.type() === 'error') errors.push(m.text()); }); host.on('pageerror', e => errors.push(String(e)));
@@ -89,15 +117,18 @@ async function settle(page) {
   await host.evaluate(() => window.__tk && window.__tk.setTrack(0)).catch(() => { });
   const h0 = await host.evaluate(() => window.__tk ? window.__tk.get() : null);
   ok(h0 && h0.peerReady, 'the right access code opens the game, which registers with the pairing service');
+  if (wantsIcon) await checkHome(host, hostGateHome, 'game page');
   await sleep(800); await snap(host, '1-lobby.png');
   const link = await host.evaluate(() => window.__tk.link());
 
   // --- phone page: typed code ---
   const p2 = await open({ viewport: { width: 780, height: 360 }, isMobile: true, hasTouch: true }, base + 'controller.html', true);
+  const p2GateHome = wantsIcon ? await homeScreen(p2) : null;
   await enter(p2, wrong); await p2.waitForFunction(() => /not right/.test(document.getElementById('err').textContent), null, { timeout: 30000 }).catch(() => { });
   const refused = await p2.evaluate(() => !window.__tc);
   await enter(p2, CODE); await p2.waitForFunction(() => window.__tc, null, { timeout: 30000 }).catch(() => { });
   ok(refused && await p2.evaluate(() => !!window.__tc && document.getElementById('needcode').style.display !== 'none'), 'phone page: wrong code refused, right code opens and asks for the game code');
+  if (wantsIcon) await checkHome(p2, p2GateHome, 'phone page');
   await p2.close();
 
   // --- phone page: QR link ---
