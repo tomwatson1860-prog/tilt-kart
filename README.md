@@ -15,7 +15,7 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
 2. Scan the QR code with a phone and tap **Start** (allow motion access if asked). The QR
    link carries the access code, so the phone does not ask for it.
 3. The Home screen comes first. Pick your kart (12 to choose from) and a track (Skyland Sprint, Inferno Keep,
-   Aurora Glacier, or Random for a different one every race) on the phone's menu, or with the mouse or arrow keys
+   Aurora Glacier, Harvey Hectacre, or Random for a different one every race) on the phone's menu, or with the mouse or arrow keys
    on the computer. The camera circles your kart on the start line of the chosen track. Press START (Enter on the
    keyboard) to race. Your picks are remembered on that computer.
 4. Hold the phone sideways. Tilt to steer, right thumb = **GAS**, left thumb = **DRIFT** (top) and **ITEM**
@@ -32,8 +32,15 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
    the track's top 10 with your new time highlighted and your overall rank. The Home screen shows the top 5 for the
    chosen track.
 
-- Three tracks, chosen on the Home screen (or Random: a different one each race, never the same twice in a row):
-  Skyland Sprint, Inferno Keep and Aurora Glacier. Scenery comes from each track's map file; each has its own road layout and landmark.
+- Four tracks, chosen on the Home screen (or Random: a different one each race, never the same twice in a row):
+  Skyland Sprint, Inferno Keep, Aurora Glacier and Harvey Hectacre. Scenery for the first three comes from each track's
+  map file; Harvey Hectacre is built in the game's code. Each has its own road layout and landmark.
+- Harvey Hectacre: an industrial site laid out from satellite pictures of a real plant. The road runs out past the
+  trailer rows, up and down the street, between the silos and the main building, down a racking aisle inside the long
+  warehouse, round the truck court and the rail spur, round the field, and into the blending tower: an open atrium with
+  a glass roof where a spiral ramp climbs three storeys round a giant kettle (smaller kettles on the floor and galleries,
+  all being filled from overhead). The way out is a steep dive to the yard, fast and loose like the Glacier's descent.
+  Buildings and walls are solid. Three stretches get an oil spill at random and turn slippery for a few seconds.
 - Inferno Keep: everything off the road is lava. The road runs on rock causeways and bridges, so drive off it
   and the cloud fishes you out. The route runs straight through a walled castle (arched gates with drawbridges and
   a raised portcullis, round and square towers, battlements, banners, a great keep with lit windows and a great
