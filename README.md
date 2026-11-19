@@ -15,7 +15,7 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
 2. Scan the QR code with a phone and tap **Start** (allow motion access if asked). The QR
    link carries the access code, so the phone does not ask for it.
 3. The Home screen comes first. Pick your kart (12 to choose from) and a track (Skyland Sprint, Inferno Keep,
-   Aurora Glacier, Harvey Hectacre, or Random for a different one every race) on the phone's menu, or with the mouse or arrow keys
+   Aurora Glacier, Harvey Hectacre, Kremlin Crash, or Random for a different one every race) on the phone's menu, or with the mouse or arrow keys
    on the computer. The camera circles your kart on the start line of the chosen track. Press START (Enter on the
    keyboard) to race. Your picks are remembered on that computer.
 4. Hold the phone sideways. Tilt to steer, right thumb = **GAS**, left thumb = **DRIFT** (top) and **ITEM**
@@ -32,9 +32,16 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
    the track's top 10 with your new time highlighted and your overall rank. The Home screen shows the top 5 for the
    chosen track.
 
-- Four tracks, chosen on the Home screen (or Random: a different one each race, never the same twice in a row):
-  Skyland Sprint, Inferno Keep, Aurora Glacier and Harvey Hectacre. Scenery for the first three comes from each track's
-  map file; Harvey Hectacre is built in the game's code. Each has its own road layout and landmark.
+- Five tracks, chosen on the Home screen (or Random: a different one each race, never the same twice in a row):
+  Skyland Sprint, Inferno Keep, Aurora Glacier, Harvey Hectacre and Kremlin Crash. Scenery for the first three comes
+  from each track's map file; the last two are built in the game's code. Each has its own road layout and landmark.
+- Kremlin Crash (shown in Cyrillic letters): a lap round a red-walled fortress on a river. Along the embankment, up
+  onto a bridge, a corkscrew down beside a many-domed cathedral, in under a clock gate tower, across the cathedral
+  square, out through a second gate, over another bridge and a steep dive back to the river. It is day or night to
+  match the player's own clock (night from 7 pm to 6 am, with everything floodlit). A warship in the river fires its
+  gun now and then; about one shot in three hits the east bridge, and the first hit of a race blows out a span. A
+  striped ramp then boosts and launches karts over the gap, and roadworks bollards stand on the approach. Karts that
+  land in the river are rescued. Three stretches of wet cobbles turn slippery at random.
 - Harvey Hectacre: an industrial site laid out from satellite pictures of a real plant. The road runs out past the
   trailer rows, up and down the street, between the silos and the main building, down a racking aisle inside the long
   warehouse, round the truck court and the rail spur, round the field, and into the blending tower: an open atrium with
