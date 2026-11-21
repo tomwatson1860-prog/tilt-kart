@@ -85,7 +85,8 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
 - Press GAS just as the countdown reaches 1 for a rocket start.
 - Item boxes give Mario Kart-style items (original designs): banana, triple banana, green shell, triple green,
   red shell (homes in on the kart ahead), triple red, blue shell (hits the leader), rocket (drives you ahead),
-  lightning (shrinks everyone else), ink (splats the screens of the karts ahead), turbo, triple turbo and star.
+  lightning (shrinks everyone else), ink (splats the screens of the karts ahead), turbo, triple turbo, star and
+  repellant (the driver sprays the kart; for 10 seconds red and blue shells miss it, green shells still hit).
   The further back you are, the better the item. Triple bananas and shells also block one hit.
 - Coins raise your top speed a little, up to 10; getting hit or falling off costs coins.
 - Original race music (synthesised in the browser, no audio files) plays from GO, speeds up on the final lap and
