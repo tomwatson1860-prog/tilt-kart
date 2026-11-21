@@ -169,6 +169,10 @@ recorded race then drives as a see-through ghost kart in later races on that tra
 Home screen (key B) opens a section with the track's top ten and a replay of the fastest recorded time or lap; rows
 that have a recording are marked and can be tapped. Times set before recording was added cannot be replayed.
 
+A recording holds the whole race: every kart, the shells and bananas, the explosions and the item boxes and
+coins picked up. The replay shows it from the game's normal camera behind the recorded driver; FULL VIEW hides
+the list. Runs recorded before 21 Nov 2026 hold only the driver's own kart and replay as a lone kart.
+
 ## Leaderboard database
 
 The leaderboard lives in a free Supabase project (Postgres). Only its address is in this repository (it is an
