@@ -15,7 +15,7 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
 2. Scan the QR code with a phone and tap **Start** (allow motion access if asked). The QR
    link carries the access code, so the phone does not ask for it.
 3. The Home screen comes first. Pick your kart (12 to choose from) and a track (Skyland Sprint, Inferno Keep,
-   Aurora Glacier, Harvey Hectacre, Kremlin Crash, or Random for a different one every race) on the phone's menu, or with the mouse or arrow keys
+   Aurora Glacier, Harvey Hectacre, Kremlin Crash, Baghdad Bazaar, Europa Eruption, or Random for a different one every race) on the phone's menu, or with the mouse or arrow keys
    on the computer. The camera circles your kart on the start line of the chosen track. Press START (Enter on the
    keyboard) to race. Your picks are remembered on that computer.
 4. Hold the phone sideways. Tilt to steer, right thumb = **GAS**, left thumb = **DRIFT** (top) and **ITEM**
@@ -32,9 +32,22 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
    the track's top 10 with your new time highlighted and your overall rank. The Home screen shows the top 5 for the
    chosen track.
 
-- Five tracks, chosen on the Home screen (or Random: a different one each race, never the same twice in a row):
-  Skyland Sprint, Inferno Keep, Aurora Glacier, Harvey Hectacre and Kremlin Crash. Scenery for the first three comes
-  from each track's map file; the last two are built in the game's code. Each has its own road layout and landmark.
+- Seven tracks, chosen on the Home screen (or Random: a different one each race, never the same twice in a row):
+  Skyland Sprint, Inferno Keep, Aurora Glacier, Harvey Hectacre, Kremlin Crash, Baghdad Bazaar and Europa Eruption.
+  Scenery for the first three comes from each track's map file; the last four are built in the game's code. Each has
+  its own road layout and landmark.
+- Baghdad Bazaar: a lap past the city's landmarks (Tahrir Square, the covered souk, the golden domes, the Baghdad
+  Tower, the crossed swords of the Victory Arch, two bridges over the Tigris). The race starts at sunset and ends in
+  the dark. Once a race a sandstorm takes the view away. Handcarts cross the souk and crates spill. From lap two the
+  second bridge's span lifts and the way over is a signed side road across three moored barges. Flying carpets appear
+  at random and carry a kart over the next bend. A tanker leaves an oil slick each lap. Every 35 seconds fighter jets
+  meet overhead; sometimes one comes down beside the road. Fireworks on the last lap.
+- Europa Eruption: Jupiter's ice moon, with low gravity all the way round. Geysers in the road throw a kart high
+  (you steer it down). The road dives through a long glass tunnel under the ice, dark at the bottom and lit by
+  glowing plants and creatures, and a shaft fires you back out. A drifting ice raft bridges a fissure (a signed
+  detour with boost strips goes round), the ice cracks into a ramp on lap two and a fissure on lap three, spires fall
+  in ice quakes, meteors leave craters, an eclipse darkens a minute of the race, and something large leaps over the
+  bridge.
 - Kremlin Crash (shown in Cyrillic letters): a lap round a red-walled fortress on a river. Along the embankment, up
   onto a bridge, a corkscrew down beside a many-domed cathedral, in under a clock gate tower, across the cathedral
   square, out through a second gate, over another bridge and a steep dive back to the river. It is day or night to

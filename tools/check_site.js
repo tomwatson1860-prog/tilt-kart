@@ -166,7 +166,7 @@ async function settle(page) {
   await phone.dispatchEvent('#tp', 'pointerdown', { pointerId: 2, bubbles: true });
   await host.waitForFunction(t => window.__tk.choice().track === t, home0.track, { timeout: 30000 }).catch(() => { });
   const home3 = await host.evaluate(() => window.__tk.choice());
-  ok(home2.track === (home0.track + 1) % 6 && home3.track === home0.track && home3.trackName === home0.trackName, 'the phone changes the track and back (' + home0.trackName + ' → ' + home2.trackName + ' → ' + home3.trackName + ')');
+  ok(home2.track === (home0.track + 1) % 8 && home3.track === home0.track && home3.trackName === home0.trackName, 'the phone changes the track and back (' + home0.trackName + ' → ' + home2.trackName + ' → ' + home3.trackName + ')');
   await host.evaluate(() => window.__tk.setTrack(0)).catch(() => { }); await settle(host);
   // --- the kart showroom, opened from the Home screen ---
   await host.click('#home-showroom');
