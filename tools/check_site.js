@@ -66,7 +66,7 @@ async function settle(page) {
   const errors = [], outside = [], sockets = [], lbCalls = [];
   // the leaderboard database is answered by a stand-in here, so check runs never add scores to the real board
   const LB_ORIGIN = cfg.allowedConnections.find(x => /^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(x));
-  const FAKE_DB = [{ track: 'skyland', name: 'Ace', time_ms: 150000, kart: 3, created_at: '2026-01-01' }, { track: 'skyland', name: 'Zed', time_ms: 900000, kart: 6, created_at: '2026-01-02' }];
+  const FAKE_DB = [{ track: 'skyland', name: 'Ace', time_ms: 150000, kart: 3, created_at: '2026-01-01' }, { track: 'skyland', name: 'Zed', time_ms: 900000, kart: 6, created_at: '2026-01-02' }]; const FAKE_GHOSTS = [];
   async function fakeLeaderboard(ctx) {
     if (!LB_ORIGIN) return;
     await ctx.route(LB_ORIGIN + '/**', async route => {
@@ -75,6 +75,10 @@ async function settle(page) {
       if (rq.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
       if (!h.apikey || h.authorization !== 'Bearer ' + h.apikey) return route.fulfill({ status: 401, headers: cors, body: '{}' });
       const tr = (u.searchParams.get('track') || '').replace('eq.', '');
+      if (/\/ghosts$/.test(u.pathname)) {          // recorded runs (ghosts) are kept apart from the times
+        if (rq.method() === 'POST') { FAKE_GHOSTS.push(JSON.parse(rq.postData() || '{}')); return route.fulfill({ status: 201, headers: cors, body: '' }); }
+        return route.fulfill({ status: 200, headers: Object.assign({ 'content-type': 'application/json' }, cors), body: JSON.stringify(FAKE_GHOSTS.filter(x => x.track === tr).slice(0, 1)) });
+      }
       if (rq.method() === 'POST') { const e = JSON.parse(rq.postData() || '{}'); FAKE_DB.push(Object.assign({ created_at: new Date().toISOString() }, e)); return route.fulfill({ status: 201, headers: cors, body: '' }); }
       if (u.searchParams.get('time_ms')) { const lt = +u.searchParams.get('time_ms').replace('lt.', ''); return route.fulfill({ status: 206, headers: Object.assign({ 'content-range': '0-0/' + FAKE_DB.filter(x => x.track === tr && x.time_ms < lt).length, 'content-type': 'application/json' }, cors), body: '[]' }); }
       const rows = FAKE_DB.filter(x => x.track === tr).sort((a, c) => a.time_ms - c.time_ms).slice(0, +u.searchParams.get('limit') || 10);
