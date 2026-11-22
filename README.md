@@ -164,8 +164,8 @@ refused. The access code is never stored in this repository.
 ## Ghosts and the leaderboard section
 
 Every race is recorded as it is driven (the kart's place ten times a second). A run is kept, in a second table
-called `ghosts`, when it is the fastest recorded race or holds the fastest recorded lap on its track. The fastest
-recorded race then drives as a see-through ghost kart in later races on that track. The LEADERBOARD button on the
+called `ghosts`, when it is the fastest recorded race or holds the fastest recorded lap on its track. Recorded runs are never shown
+during a race. The LEADERBOARD button on the
 Home screen (key B) opens a section with the track's top ten and a replay of the fastest recorded time or lap; rows
 that have a recording are marked and can be tapped. Times set before recording was added cannot be replayed.
 
