@@ -147,6 +147,11 @@ async function settle(page) {
 
   // --- the Home screen: pick a kart and a track from the phone, then START ---
   await phone.waitForFunction(() => window.__tc.get().menu, null, { timeout: 8000 }).catch(() => { });
+  const homeR = await host.evaluate(() => window.__tk.choice());
+  ok(homeR.track === 7 && (await host.evaluate(() => document.querySelector('#trk-list .trk').dataset.t)) === '7', 'a first visit opens on Random, which is the first track button');
+  await host.keyboard.press('ArrowDown');          // Random -> Skyland Sprint, so the checks below start from a known track
+  await host.waitForFunction(() => window.__tk.choice().track === 0 && window.__tk.choice().trackName === 'Skyland Sprint', null, { timeout: 30000 }).catch(() => { });
+  await phone.waitForFunction(() => /Skyland/.test(window.__tc.get().track), null, { timeout: 8000 }).catch(() => { });
   const home0 = await host.evaluate(() => window.__tk.choice()), menu0 = await phone.evaluate(() => window.__tc.get());
   ok(home0.home && (await host.evaluate(() => window.__tk.get().phase)) === 'lobby' && menu0.menu && menu0.kart.length > 0, 'the game opens on the Home screen and the phone shows the kart & track menu (' + menu0.kart + ', ' + menu0.track + ')');
   if (LB_ORIGIN) {

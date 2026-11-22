@@ -14,10 +14,13 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
 1. Open the website on a computer and enter the access code.
 2. Scan the QR code with a phone and tap **Start** (allow motion access if asked). The QR
    link carries the access code, so the phone does not ask for it.
-3. The Home screen comes first. Pick your kart (12 to choose from) and a track (Skyland Sprint, Inferno Keep,
-   Aurora Glacier, Harvey Hectacre, Kremlin Crash, Baghdad Bazaar, Europa Eruption, or Random for a different one every race) on the phone's menu, or with the mouse or arrow keys
-   on the computer. The camera circles your kart on the start line of the chosen track. Press START (Enter on the
-   keyboard) to race. Your picks are remembered on that computer.
+3. The Home screen comes first. Pick your kart (12 to choose from) and a track (Random, the default, for a different
+   one every race, or Skyland Sprint, Inferno Keep, Aurora Glacier, Harvey Hectacre, Kremlin Crash, Baghdad Bazaar,
+   Europa Eruption) on the phone's menu, or with the mouse or arrow keys on the computer. The track list shows four
+   tracks at a time and scrolls to the rest. The camera circles your kart on the start line of the chosen track.
+   Press START (Enter on the keyboard) to race. Your picks are remembered on that computer. SETTINGS (under the
+   track list, key O) has music on/off and the keyboard keys. SHOWROOM (key G) shows the karts on a turntable in
+   the Tommio Kart garage.
 4. Hold the phone sideways. Tilt to steer, right thumb = **GAS**, left thumb = **DRIFT** (top) and **ITEM**
    (bottom). The big middle button starts a race, then pauses and resumes it (P on the keyboard does the same).
 5. Two players: a second phone scans the same QR code and joins as Player 2, picking their own kart on the
@@ -106,7 +109,8 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
   sparkles while you have a Star. Press M on the computer to turn it off or on. If there is no sound, click the
   game screen once.
 
-No phone? Arrow keys steer, Up = gas, Down = brake, Shift = drift (and tricks), Space = item, M = music.
+No phone? Arrow keys steer, Up = gas, Down = brake, Shift = drift (and tricks), Space = item, hold Z = rear view
+(the whole screen looks back until Z is released), P = pause, M = music.
 
 ## Play on a phone by itself
 
