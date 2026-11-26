@@ -14,7 +14,7 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
 1. Open the website on a computer and enter the access code.
 2. Scan the QR code with a phone and tap **Start** (allow motion access if asked). The QR
    link carries the access code, so the phone does not ask for it.
-3. The Home screen comes first. Pick your kart (12 to choose from) and a track (Random, the default, for a different
+3. The Home screen comes first. Pick your kart (14 to choose from, including the two American karts: the Patriot Pickup, whose driver shouts "Howdy y'all!" twice a race using a voice already on your device, and the Freedom Fastback) and a track (Random, the default, for a different
    one every race, or Skyland Sprint, Inferno Keep, Aurora Glacier, Harvey Hectacre, Kremlin Crash, Baghdad Bazaar,
    Europa Eruption, Tokyo Midnight, Tokyo Sunset) on the phone's menu, or with the mouse or arrow keys on the computer. The track list shows four
    tracks at a time and scrolls to the rest. The camera circles your kart on the start line of the chosen track.
