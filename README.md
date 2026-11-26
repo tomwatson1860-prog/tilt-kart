@@ -16,11 +16,11 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
    link carries the access code, so the phone does not ask for it.
 3. The Home screen comes first. Pick your kart (12 to choose from) and a track (Random, the default, for a different
    one every race, or Skyland Sprint, Inferno Keep, Aurora Glacier, Harvey Hectacre, Kremlin Crash, Baghdad Bazaar,
-   Europa Eruption) on the phone's menu, or with the mouse or arrow keys on the computer. The track list shows four
+   Europa Eruption, Tokyo Midnight, Tokyo Sunset) on the phone's menu, or with the mouse or arrow keys on the computer. The track list shows four
    tracks at a time and scrolls to the rest. The camera circles your kart on the start line of the chosen track.
    Press START (Enter on the keyboard) to race. Your picks are remembered on that computer. SETTINGS (under the
    track list, key O) has music on/off, Realistic graphics on/off (on for computers, off for phones; tracks with a
-   realistic look: Europa Eruption) and the keyboard keys. SHOWROOM (key G) shows the karts on a turntable in
+   realistic look: Europa Eruption, Tokyo Midnight and Tokyo Sunset) and the keyboard keys. SHOWROOM (key G) shows the karts on a turntable in
    the Tommio Kart garage.
 4. Hold the phone sideways. Tilt to steer, right thumb = **GAS**, left thumb = **DRIFT** (top) and **ITEM**
    (bottom). The big middle button starts a race, then pauses and resumes it (P on the keyboard does the same).
@@ -36,9 +36,10 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
    the track's top 10 with your new time highlighted and your overall rank. The Home screen shows the top 5 for the
    chosen track.
 
-- Seven tracks, chosen on the Home screen (or Random: a different one each race, never the same twice in a row):
-  Skyland Sprint, Inferno Keep, Aurora Glacier, Harvey Hectacre, Kremlin Crash, Baghdad Bazaar and Europa Eruption.
-  Scenery for the first three comes from each track's map file; the last four are built in the game's code. Each has
+- Nine tracks, chosen on the Home screen (or Random: a different one each race, never the same twice in a row):
+  Skyland Sprint, Inferno Keep, Aurora Glacier, Harvey Hectacre, Kremlin Crash, Baghdad Bazaar, Europa Eruption,
+  Tokyo Midnight and Tokyo Sunset. Scenery for the first three comes from each track's map file; the rest are built
+  in the game's code. Each has
   its own road layout and landmark.
 - Baghdad Bazaar: a lap past the city's landmarks (Tahrir Square, the covered souk, the golden domes, the Baghdad
   Tower, the crossed swords of the Victory Arch, two bridges over the Tigris). The race starts at sunset and ends in
@@ -84,6 +85,11 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
   cages, exhausts, glowing lights and underglow. A helmeted driver in a matching race suit sits at the wheel; the
   wheels spin and the front wheels steer. Each player picks their own kart on the
   Home screen; the computer drivers get a different mix of the others every race.
+- Tokyo Midnight and Tokyo Sunset: one map of Japan, at night under a full moon or at sunset. Shibuya's crossing,
+  Sakura-dori under cherry blossom, a live fish market, Akihabara's neon street, a temple quarter and a climb over
+  Mount Fuji with the Pacific on the horizon. The long Shibuya stretch is a maze of tight neon streets with four ways
+  through of about the same length: the street weave, an underground neon tunnel, a curly ramp up to an elevated road,
+  and a road beside the bullet-train line, where the train races you. Snow falls near Fuji's top.
 - Graphics: soft physically based materials lit by each track's own sky, real sun shadows, a glow on bright things
   (lava, flames, sparks, headlights, item boxes), smoother scenery, detailed ground, glossy items. On a slow computer
   the game lowers its own quality step by step (sharpness, then glow, then shadows, then resolution).
