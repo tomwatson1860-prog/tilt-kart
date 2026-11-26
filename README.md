@@ -20,7 +20,7 @@ in the visitor's browser, so this repository holds no readable copy of it. Ask t
    tracks at a time and scrolls to the rest. The camera circles your kart on the start line of the chosen track.
    Press START (Enter on the keyboard) to race. Your picks are remembered on that computer. SETTINGS (under the
    track list, key O) has music on/off, Realistic graphics on/off (on for computers, off for phones; tracks with a
-   realistic look: Baghdad Bazaar, Europa Eruption, Tokyo Midnight and Tokyo Sunset) and the keyboard keys. SHOWROOM (key G) shows the karts on a turntable in
+   realistic look: Kremlin Crash, Baghdad Bazaar, Europa Eruption, Tokyo Midnight and Tokyo Sunset) and the keyboard keys. SHOWROOM (key G) shows the karts on a turntable in
    the Tommio Kart garage.
 4. Hold the phone sideways. Tilt to steer, right thumb = **GAS**, left thumb = **DRIFT** (top) and **ITEM**
    (bottom). The big middle button starts a race, then pauses and resumes it (P on the keyboard does the same).
